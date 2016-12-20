@@ -9,12 +9,11 @@
     android:numColumns="3"
 
     android:layout_centerInParent="true"
-
-
+    android:verticalSpacing="3dp"
+    android:horizontalSpacing="3dp"
     android:gravity="center"
     android:layout_gravity="center"
-    android:verticalSpacing="5dp"
-    android:horizontalSpacing="10dp"
+
     android:stretchMode="columnWidth"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >

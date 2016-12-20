@@ -7,17 +7,14 @@
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/memory_list"
         android:numColumns="1"
+        android:layout_marginTop="10dp"
 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
 
-
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:verticalSpacing="5dp"
         android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:verticalSpacing="10dp" >
 </GridView>
 
 

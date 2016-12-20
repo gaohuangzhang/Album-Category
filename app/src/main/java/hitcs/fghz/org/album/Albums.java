@@ -64,7 +64,7 @@ public class Albums extends Fragment {
     private void initAlbums() {
         AlbumItem album;
         for (String s: data) {
-             album = new AlbumItem(s, R.drawable.search);
+             album = new AlbumItem(s, R.drawable.girl);
             albumList.add(album);
         }
         album = new AlbumItem("Add", R.drawable.add);
