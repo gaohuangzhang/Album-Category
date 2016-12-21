@@ -1,24 +1,20 @@
 package hitcs.fghz.org.album;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jay on 2015/8/28 0028.
- */
+import hitcs.fghz.org.album.entity.MemoryItem;
+import hitcs.fghz.org.album.adapter.MemoryAdapter;
+
 public class Memory extends Fragment {
 
     private String content;
@@ -37,7 +33,6 @@ public class Memory extends Fragment {
 
         MemoryAdapter adapter = new MemoryAdapter(getActivity(), R.layout.memory_item, memoryList);
 
-        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,numbers);
         gridView.setAdapter(adapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -59,28 +54,4 @@ public class Memory extends Fragment {
         }
     }
 }
-class MemoryItem {
-    private int imageId;
-    public MemoryItem(int imageId) {
-        this.imageId = imageId;
-    }
-    public int getImageId() {
-        return imageId;
-    }
-}
-class MemoryAdapter extends ArrayAdapter<MemoryItem> {
-    private int resourceId;
-    public MemoryAdapter(Context context, int textViewResourceId,
-                        List<MemoryItem> objects) {
-        super(context, textViewResourceId, objects);
-        resourceId = textViewResourceId;
-    }
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        MemoryItem photo= getItem(position);
-        View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
-        ImageView memoryImage = (ImageView) view.findViewById(R.id.memory_photo);
-        memoryImage.setImageResource(photo.getImageId());
-        return view;
-    }
-}
+

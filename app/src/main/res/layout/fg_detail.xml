@@ -15,7 +15,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="center"
-            android:layout_margin="10dp"
+            android:layout_margin="0dp"
             android:scaleType="centerCrop"
              />
     </FrameLayout>
@@ -23,7 +23,7 @@
     <hitcs.fghz.org.album.MyHorizontalScrollView
         android:id="@+id/id_horizontalScrollView"
         android:layout_width="wrap_content"
-        android:layout_height="150dp"
+        android:layout_height="50dp"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         android:scrollbars="none" >
@@ -41,7 +41,7 @@
     <View
         android:id="@+id/div_tab_bar"
         android:layout_width="match_parent"
-        android:layout_height="2px"
+        android:layout_height="1px"
         android:background="@color/div_white"
         android:layout_above="@id/ly_tab_bar"/>
 

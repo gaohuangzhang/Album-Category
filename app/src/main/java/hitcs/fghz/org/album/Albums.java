@@ -3,24 +3,18 @@ package hitcs.fghz.org.album;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import hitcs.fghz.org.album.entity.AlbumItem;
+import hitcs.fghz.org.album.adapter.AlbumAdapter;
 
 /**
  * Created by me on 16-12-19.
@@ -72,36 +66,4 @@ public class Albums extends Fragment {
 
     }
 }
-class AlbumItem {
-    private String name;
-    private int imageId;
-    public AlbumItem(String name, int imageId) {
-        this.name = name;
-        this.imageId = imageId;
 
-    }
-    public String getName() {
-        return name;
-    }
-    public int getImageId() {
-        return imageId;
-    }
-}
-class AlbumAdapter extends ArrayAdapter<AlbumItem> {
-    private int resourceId;
-    public AlbumAdapter(Context context, int textViewResourceId,
-                        List<AlbumItem> objects) {
-        super(context, textViewResourceId, objects);
-        resourceId = textViewResourceId;
-    }
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        AlbumItem album = getItem(position);
-        View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
-        ImageView albumImage = (ImageView) view.findViewById(R.id.album_image);
-        TextView albumName = (TextView) view.findViewById(R.id.album_name);
-        albumImage.setImageResource(album.getImageId());
-        albumName.setText(album.getName());
-        return view;
-    }
-}

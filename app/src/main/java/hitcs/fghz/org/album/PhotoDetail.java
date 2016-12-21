@@ -1,11 +1,14 @@
 package hitcs.fghz.org.album;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -18,6 +21,9 @@ import android.widget.TextView;
  * Created by me on 16-12-20.
  */
 
+import hitcs.fghz.org.album.MyHorizontalScrollView.*;
+import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
+
 public class PhotoDetail extends Activity implements View.OnClickListener {
 
     private TextView txt_back;
@@ -25,14 +31,53 @@ public class PhotoDetail extends Activity implements View.OnClickListener {
     private TextView txt_love;
     private TextView txt_delete;
 
+    private MyHorizontalScrollView mHorizontalScrollView;
+    private HorizontalScrollViewAdapter mAdapter;
+    private ImageView mImg;
+    private List<Integer> mDatas = new ArrayList<Integer>(Arrays.asList(
+            R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d,
+            R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h,
+            R.drawable.l));
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         System.out.println("HERE");
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
 
         setContentView(R.layout.fg_detail);
+
         bindViews();
+
+        mImg = (ImageView) findViewById(R.id.id_content);
+
+        mHorizontalScrollView = (MyHorizontalScrollView) findViewById(R.id.id_horizontalScrollView);
+        mAdapter = new HorizontalScrollViewAdapter(this, mDatas);
+        //添加滚动回调
+        mHorizontalScrollView
+                .setCurrentImageChangeListener(new CurrentImageChangeListener()
+                {
+                    @Override
+                    public void onCurrentImgChanged(int position,
+                                                    View viewIndicator)
+                    {
+                        mImg.setImageResource(mDatas.get(position));
+                        viewIndicator.setBackgroundColor(Color.parseColor("#AA024DA4"));
+                    }
+                });
+        //添加点击回调
+        mHorizontalScrollView.setOnItemClickListener(new OnItemClickListener()
+        {
+
+            @Override
+            public void onClick(View view, int position)
+            {
+                mImg.setImageResource(mDatas.get(position));
+                view.setBackgroundColor(Color.parseColor("#AA024DA4"));
+            }
+        });
+        //设置适配器
+        mHorizontalScrollView.initDatas(mAdapter);
     }
     //UI组件初始化与事件绑定
     private void bindViews() {
@@ -81,64 +126,4 @@ public class PhotoDetail extends Activity implements View.OnClickListener {
                 break;
         }
     }
-}
-class HorizontalScrollViewAdapter
-{
-
-    private Context mContext;
-    private LayoutInflater mInflater;
-    private List<Integer> mDatas;
-
-    public HorizontalScrollViewAdapter(Context context, List<Integer> mDatas)
-    {
-        this.mContext = context;
-        mInflater = LayoutInflater.from(context);
-        this.mDatas = mDatas;
-    }
-
-    public int getCount()
-    {
-        return mDatas.size();
-    }
-
-    public Object getItem(int position)
-    {
-        return mDatas.get(position);
-    }
-
-    public long getItemId(int position)
-    {
-        return position;
-    }
-
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
-        ViewHolder viewHolder = null;
-        if (convertView == null)
-        {
-            viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(
-                    R.layout.fg_detail, parent, false);
-            viewHolder.mImg = (ImageView) convertView
-                    .findViewById(R.id.id_content);
-//            viewHolder.mText = (TextView) convertView
-//                    .findViewById(R.id.);
-
-            convertView.setTag(viewHolder);
-        } else
-        {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-        viewHolder.mImg.setImageResource(mDatas.get(position));
-        viewHolder.mText.setText("some info ");
-
-        return convertView;
-    }
-
-    private class ViewHolder
-    {
-        ImageView mImg;
-        TextView mText;
-    }
-
 }

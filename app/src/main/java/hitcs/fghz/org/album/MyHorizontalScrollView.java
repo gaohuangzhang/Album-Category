@@ -21,6 +21,8 @@ import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
+import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
+
 public class MyHorizontalScrollView extends HorizontalScrollView implements
         OnClickListener
 {

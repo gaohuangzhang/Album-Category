@@ -1,7 +1,5 @@
 package hitcs.fghz.org.album;
 
-
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -15,7 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
- * Created by Coder-pig on 2015/8/28 0028.
+ * Created by dongchang @ 20161218
  */
 public class MainActivity extends Activity implements View.OnClickListener{
 
