@@ -1,6 +1,7 @@
 package hitcs.fghz.org.album.adapter;
 
 /**
+ * 照片细节的适配器
  * Created by me on 16-12-21.
  */
 

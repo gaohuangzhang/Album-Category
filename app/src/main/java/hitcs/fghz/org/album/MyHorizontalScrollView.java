@@ -1,6 +1,7 @@
 package hitcs.fghz.org.album;
 
 /**
+ * 自定义的布局，可以按需修改
  * Created by me on 16-12-20.
  */
 

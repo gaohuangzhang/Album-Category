@@ -15,7 +15,12 @@ import java.util.List;
 import hitcs.fghz.org.album.entity.MemoryItem;
 import hitcs.fghz.org.album.adapter.MemoryAdapter;
 
+/**
+ * 回忆 栏的fregment的具体定义
+ */
+
 public class Memory extends Fragment {
+    // 同photos.java
 
     private String content;
     public Memory(String content) {

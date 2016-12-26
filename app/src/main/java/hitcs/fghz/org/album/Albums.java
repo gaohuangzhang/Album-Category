@@ -17,6 +17,9 @@ import hitcs.fghz.org.album.entity.AlbumItem;
 import hitcs.fghz.org.album.adapter.AlbumAdapter;
 
 /**
+ * 相册的fregment 的具体动作
+ * 请首先阅读photos.java
+ *
  * Created by me on 16-12-19.
  */
 
@@ -43,6 +46,9 @@ public class Albums extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 System.out.println(position+ " " +id);
+                // 进入一个新的fregment，这个fregment就是photos.java
+                // photos.java中显示具体相册的具体照片
+                //创建新的photos对象，初始数值qq暂时没有用， 可以定义为相册id等，但是需要进一步修改
                 Photos myJDEditFragment = new Photos("qq");
                 ft = manager.beginTransaction();
                 ft.add(R.id.ly_content , myJDEditFragment);

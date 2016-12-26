@@ -13,6 +13,7 @@ import hitcs.fghz.org.album.R;
 import hitcs.fghz.org.album.entity.MemoryItem;
 
 /**
+ * 回忆栏目的适配器
  * Created by me on 16-12-21.
  */
 

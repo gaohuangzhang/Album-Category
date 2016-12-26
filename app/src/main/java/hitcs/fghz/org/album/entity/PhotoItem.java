@@ -1,6 +1,7 @@
 package hitcs.fghz.org.album.entity;
 
 /**
+ * 相片的元素
  * Created by me on 16-12-21.
  */
 
