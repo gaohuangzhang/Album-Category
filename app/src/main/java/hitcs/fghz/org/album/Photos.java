@@ -7,12 +7,15 @@ package hitcs.fghz.org.album;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +69,18 @@ public class Photos extends Fragment {
         // 用drawable文件夹中的search.png
         // 在数组中放100张上述图片
         // 后续实现应该放入具体的照片
+        /**
+         * Environment.getExternalStorageState()获取路径是否成功
+         */
+
+        /*if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            String path=Environment.getExternalStorageDirectory().getPath();
+        }
+        String path=Environment.getExternalStorageDirectory()+"autophoto";
+        File file=new File(path);
+        if (!file.exists()) {
+            file.mkdir();
+        }*/
         for (int i = 0; i != 100; ++i) {
             photo = new PhotoItem(R.drawable.search);
             photoList.add(photo);
