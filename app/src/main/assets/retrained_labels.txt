@@ -1,0 +1,5 @@
+scenery
+car
+flower
+building
+people

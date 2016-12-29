@@ -4,12 +4,12 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
@@ -114,6 +114,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
             case R.id.action_camera:
                 // 拍照
                 System.out.println("Camera");
+                // 进入查看相片细节的activity， 注意这个是activity不是fregment
+                Intent intent = new Intent(this, CameraActivity.class);
+                startActivity(intent);
+
                 break;
             // 语音
 
