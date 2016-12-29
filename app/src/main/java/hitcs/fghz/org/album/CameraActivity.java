@@ -46,7 +46,7 @@ public class CameraActivity extends Activity {
     private static final String INPUT_NAME = "Mul:0";
     private static final String OUTPUT_NAME = "final_result:0";
 
-    private static final String MODEL_FILE = "file:///android_asset/stripped_graph1.pb";
+    private static final String MODEL_FILE = "file:///android_asset/stripped_graph.pb";
     private static final String LABEL_FILE =
             "file:///android_asset/retrained_labels.txt";
 
