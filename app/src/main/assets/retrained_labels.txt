@@ -1,5 +1,13 @@
 scenery
-car
+classroom
 flower
-building
+group photo
 people
+car
+work space
+snow
+things
+animal
+text
+building
+manga

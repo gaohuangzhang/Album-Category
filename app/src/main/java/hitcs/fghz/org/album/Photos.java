@@ -7,15 +7,12 @@ package hitcs.fghz.org.album;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +52,7 @@ public class Photos extends Fragment {
                                     int position, long id) {
                 System.out.println(position+ " " +id);
                 // 进入查看相片细节的activity， 注意这个是activity不是fregment
-                Intent intent = new Intent(getActivity(), PhotoDetail.class);
+                Intent intent = new Intent(getActivity(), PhotoDetailActivity.class);
                 startActivity(intent);
 
             }
@@ -66,7 +63,7 @@ public class Photos extends Fragment {
     // 初始化照片数组
     private void initPhoto() {
         PhotoItem photo;
-        // 用drawable文件夹中的search.png
+        // 用drawable文件夹中的search.p
         // 在数组中放100张上述图片
         // 后续实现应该放入具体的照片
         /**

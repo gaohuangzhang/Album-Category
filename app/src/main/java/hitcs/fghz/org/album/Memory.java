@@ -44,7 +44,7 @@ public class Memory extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 System.out.println(position+ " " +id);
-                Intent intent = new Intent(getActivity(), PhotoDetail.class);
+                Intent intent = new Intent(getActivity(), PhotoDetailActivity.class);
                 startActivity(intent);
             }
         });

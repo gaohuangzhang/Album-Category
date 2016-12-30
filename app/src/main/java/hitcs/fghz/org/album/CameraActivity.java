@@ -17,6 +17,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,32 +29,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.tensorflow.demo.Classifier;
-import org.tensorflow.demo.TensorFlowImageClassifier;
+
 
 public class CameraActivity extends Activity {
     /** Called when the activity is first created. */
 
-    // These are the settings for the original v1 Inception model. If you want to
-    // use a model that's been produced from the TensorFlow for Poets codelab,
-    // you'll need to set IMAGE_SIZE = 299, IMAGE_MEAN = 128, IMAGE_STD = 128,
-    // INPUT_NAME = "Mul:0", and OUTPUT_NAME = "final_result:0".
-    // You'll also need to update the MODEL_FILE and LABEL_FILE paths to point to
-    // the ones you produced.
-    private static final int NUM_CLASSES = 6;
     private static final int INPUT_SIZE = 299;
-    private static final int IMAGE_MEAN = 128;
-    private static final float IMAGE_STD = 128;
-    private static final String INPUT_NAME = "Mul:0";
-    private static final String OUTPUT_NAME = "final_result:0";
-
-    private static final String MODEL_FILE = "file:///android_asset/stripped_graph.pb";
-    private static final String LABEL_FILE =
-            "file:///android_asset/retrained_labels.txt";
-
-    private TensorFlowImageClassifier classifier;
+    private ImageClassifier imageClassifier;
     private TextView mResultText;
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,14 +45,8 @@ public class CameraActivity extends Activity {
 
 
         // test1 load tensorflow
-        classifier = new TensorFlowImageClassifier();
-        try {
-            classifier.initializeTensorFlow(
-                    getAssets(), MODEL_FILE, LABEL_FILE, NUM_CLASSES, INPUT_SIZE, IMAGE_MEAN, IMAGE_STD,
-                    INPUT_NAME, OUTPUT_NAME);
-        } catch (final IOException e) {
-           ;
-        }
+        imageClassifier = new ImageClassifier();
+        imageClassifier.initTensorflow(getAssets());
 
         // test1 end
 
@@ -99,7 +76,6 @@ public class CameraActivity extends Activity {
             Log.e("uri", uri.toString());
             ContentResolver cr = this.getContentResolver();
             try {
-                System.out.println("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
                 Bitmap bitmap = BitmapFactory.decodeStream(cr.openInputStream(uri));
                 dealPics(bitmap);
             } catch (FileNotFoundException e) {
@@ -126,7 +102,7 @@ public class CameraActivity extends Activity {
         Bitmap newbm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 
         imageView.setImageBitmap(newbm);
-        final List<Classifier.Recognition> results = classifier.recognizeImage(newbm);
+        final List<Classifier.Recognition> results = imageClassifier.recognizeImage(newbm);
         for (final Classifier.Recognition result : results) {
             System.out.println("Result: " + result.getTitle());
         }

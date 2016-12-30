@@ -20,7 +20,7 @@
              />
     </FrameLayout>
 
-    <hitcs.fghz.org.album.MyHorizontalScrollView
+    <hitcs.fghz.org.album.view.MyHorizontalScrollView
         android:id="@+id/id_horizontalScrollView"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
@@ -35,7 +35,7 @@
             android:layout_gravity="center_vertical"
             android:orientation="horizontal" >
         </LinearLayout>
-    </hitcs.fghz.org.album.MyHorizontalScrollView>
+    </hitcs.fghz.org.album.view.MyHorizontalScrollView>
 
 
     <View
