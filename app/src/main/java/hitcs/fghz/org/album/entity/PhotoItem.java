@@ -7,10 +7,11 @@ package hitcs.fghz.org.album.entity;
 
 public class PhotoItem {
     private int imageId;
-    public PhotoItem(int imageId) {
-        this.imageId = imageId;
+    private String data;
+    public PhotoItem(String data) {
+        this.data = data;
     }
-    public int getImageId() {
-        return imageId;
+    public String getImageId() {
+        return data;
     }
 }

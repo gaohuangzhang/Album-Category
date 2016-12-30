@@ -5,16 +5,26 @@ package hitcs.fghz.org.album;
  * Created by me on 16-12-19.
  */
 import android.app.Fragment;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // 导入相片的元素（一个照片）
 import hitcs.fghz.org.album.entity.PhotoItem;
@@ -24,14 +34,15 @@ import hitcs.fghz.org.album.adapter.PhotoAdapter;
 
 public class Photos extends Fragment {
 
-    private String content;
+    // 所有照片  或者  某个相册
+    private String type;
     private List<PhotoItem> photoList = new ArrayList<PhotoItem>();
 
     // 声明一个gridview
     GridView gridView;
-    // 一个构造方法 现在没啥用
-    public Photos(String content) {
-        this.content = content;
+    public Photos(String type) {
+
+        this.type = type;
     }
 
     // 重写创建fregement方法
@@ -62,26 +73,66 @@ public class Photos extends Fragment {
     }
     // 初始化照片数组
     private void initPhoto() {
+        final List<Map> mediaImageInfo;
+        mediaImageInfo = getMediaImageInfo(getContext());
+
         PhotoItem photo;
+
+        for (Map<String, String> map : mediaImageInfo) {
+            photo = new PhotoItem(map.get("_data"));
+            System.out.println(map.get("_data"));
+            photoList.add(photo);
+        }
+
         // 用drawable文件夹中的search.p
         // 在数组中放100张上述图片
         // 后续实现应该放入具体的照片
-        /**
-         * Environment.getExternalStorageState()获取路径是否成功
-         */
+//        for (int i = 0; i != 100; ++i) {
+//            photo = new PhotoItem(R.drawable.search);
+//            photoList.add(photo);
+//        }
 
-        /*if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            String path=Environment.getExternalStorageDirectory().getPath();
+    }
+    /**
+     * 异步扫描SD卡多媒体文件,不阻塞当前线程
+     *
+     * @param ctx
+     * @param file 扫描的指定文件
+     */
+    public static void scanMediaAsync(Context ctx, File file) {
+        Intent scanner = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        scanner.setData(Uri.fromFile(file));
+        ctx.sendBroadcast(scanner);
+    }
+    public static List<Map> getMediaImageInfo(Context ctx) {
+        //可以手动指定获取的列
+        String[] columns = new String[]{
+                MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.Media.TITLE, MediaStore.Images.Media.DISPLAY_NAME
+                , MediaStore.Images.Media.LATITUDE, MediaStore.Images.Media.LONGITUDE, MediaStore.Images.Media.DATE_TAKEN};
+        ContentResolver contentResolver = ctx.getContentResolver();
+       Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;//外部存储的SD卡的访问Uri
+//        MediaStore.Images.Media.INTERNAL_CONTENT_URI
+        Cursor cursor = contentResolver.query(uri, null, null, null, null);//获取全部列
+//        Cursor cursor = contentResolver.query(uri, columns, null, null, null);//获取指定列
+        if (cursor != null) {
+            Map<String, String> item = null;
+            List<Map> result = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                String[] columnNames = cursor.getColumnNames();
+                item = new HashMap<>();
+                for (String colnmnName : columnNames) {
+                    int columnIndex = cursor.getColumnIndex(colnmnName);
+                    String columnValue = cursor.getString(columnIndex);
+                    item.put(colnmnName, columnValue);
+                }
+                result.add(item);
+                Log.d("debug", "getMediaImageInfo() item=" + item);
+            }
+            Log.d("debug", "getMediaImageInfo() size=" + result.size() + ", result=" + result);
+            return result;
         }
-        String path=Environment.getExternalStorageDirectory()+"autophoto";
-        File file=new File(path);
-        if (!file.exists()) {
-            file.mkdir();
-        }*/
-        for (int i = 0; i != 100; ++i) {
-            photo = new PhotoItem(R.drawable.search);
-            photoList.add(photo);
-        }
+
+        return null;
     }
 }
 

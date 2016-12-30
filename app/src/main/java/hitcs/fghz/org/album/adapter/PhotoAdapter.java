@@ -1,12 +1,14 @@
 package hitcs.fghz.org.album.adapter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.util.List;
 
 import hitcs.fghz.org.album.R;
@@ -29,7 +31,7 @@ public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
         PhotoItem photo= getItem(position); // 获取当前项的Fruit实例
         View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
         ImageView photoImage = (ImageView) view.findViewById(R.id.photo_small);
-        photoImage.setImageResource(photo.getImageId());
+        photoImage.setImageURI(Uri.fromFile(new File(photo.getImageId())));  //setImageResource(photo.getImageId());
         return view;
     }
-}
+}   
