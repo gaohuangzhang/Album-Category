@@ -1,16 +1,36 @@
 package hitcs.fghz.org.album;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ClipData;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * 主活动
@@ -60,6 +80,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private Albums albums;
     private FragmentManager fManager;
 
+    // camera
+    private Uri contentUri;
+    private File newFile;
+
+
+
     private String last_click = "PHOTO";
 
     @Override
@@ -73,6 +99,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
         actionBar.setDisplayShowTitleEnabled(true);
         // 生成布局
         setContentView(R.layout.activity_main);
+        // 申请相机权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
         fManager = getFragmentManager();
         // 绑定事件
         bindViews();
@@ -113,19 +143,69 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
             case R.id.action_camera:
                 // 拍照
-                System.out.println("Camera");
-                // 进入查看相片细节的activity， 注意这个是activity不是fregment
-                Intent intent = new Intent(this, CameraActivity.class);
-                startActivity(intent);
-
+                startCamera();
                 break;
-            // 语音
+                // 语音
 
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * 打开相机获取图片
+     */
+    private void startCamera() {
+        File imagePath = new File(Environment.getExternalStorageDirectory(), "images");
+        if (!imagePath.exists()) imagePath.mkdirs();
+        newFile = new File(imagePath, "default_image.jpg");
+
+        //第二参数是在manifest.xml定义 provider的authorities属性
+        contentUri = FileProvider.getUriForFile(this, "hitcs.fghz.org.album.fileprovider", newFile);
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //兼容版本处理，因为 intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION) 只在5.0以上的版本有效
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            ClipData clip =
+                    ClipData.newUri(getContentResolver(), "A photo", contentUri);
+            intent.setClipData(clip);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        } else {
+            List<ResolveInfo> resInfoList =
+                    getPackageManager()
+                            .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                grantUriPermission(packageName, contentUri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+        }
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
+        startActivityForResult(intent, 1000);
+    }
+    // 接受拍照的结果
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            ContentResolver contentProvider = getContentResolver();
+            ParcelFileDescriptor mInputPFD;
+            try {
+                //获取contentProvider图片
+                mInputPFD = contentProvider.openFileDescriptor(contentUri, "r");
+                FileDescriptor fileDescriptor = mInputPFD.getFileDescriptor();
+                System.out.println("here");
+               // mImageView.setImageBitmap(BitmapFactory.decodeFileDescriptor(fileDescriptor));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
 
     //UI组件初始化与事件绑定
     private void bindViews() {
