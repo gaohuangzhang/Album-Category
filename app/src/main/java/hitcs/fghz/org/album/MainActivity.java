@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.speech.tts.Voice;
 import android.support.v4.content.FileProvider;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,10 +27,18 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.iflytek.cloud.RecognizerResult;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechUtility;
+import com.iflytek.cloud.ui.RecognizerDialog;
+import com.iflytek.cloud.ui.RecognizerDialogListener;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -108,6 +117,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         bindViews();
         //模拟一次点击，既进去后选择第一项
         txt_photos.performClick();
+        //创建语音配置对象
+        SpeechUtility.createUtility(this, SpeechConstant.APPID+"=5867596e");
     }
 
     /**
@@ -146,11 +157,49 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 startCamera();
                 break;
                 // 语音
-
+            case R.id.action_voice:
+                startRecord();
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 语音识别
+     */
+    private void startRecord() {
+        RecognizerDialog mDialog = new RecognizerDialog(this, null);
+        mDialog.setParameter(SpeechConstant.DOMAIN, "iat");
+        mDialog.setParameter(SpeechConstant.LANGUAGE, "zh-cn");
+        mDialog.setParameter(SpeechConstant.ACCENT, "mandarin");
+        mDialog.setListener(new RecognizerDialogListener() {
+            @Override
+            public void onResult(RecognizerResult recognizerResult, boolean b) {
+                if (!b) {
+                    parseVoice(recognizerResult.getResultString());
+                }
+            }
+
+            @Override
+            public void onError(SpeechError speechError) {
+
+            }
+        });
+        mDialog.show();
+        Toast.makeText(this, "请开始说话", Toast.LENGTH_SHORT).show();
+    }
+
+    private void parseVoice(String resultString) {
+        Gson gson = new Gson();
+        Voice voiceBean = gson.fromJson(resultString, Voice.class);
+        StringBuffer sb = new StringBuffer();
+        ArrayList<Voice.WSBean> ws = voiceBean.ws;
+        for (Voice.WSBean wsBean : ws) {
+            String word = wsBean.cw.get(0).w;
+            sb.append(word);
+        }
+        Toast.makeText(this, sb.toString(), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -286,5 +335,17 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
         }
         fTransaction.commit();
+    }
+
+    public class Voice {
+        public ArrayList<WSBean> ws;
+
+        public class WSBean {
+            public ArrayList<CWBean> cw;
+        }
+
+        public class CWBean {
+            public String w;
+        }
     }
 }
