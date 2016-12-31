@@ -23,8 +23,8 @@ public class Memory extends Fragment {
     // 同photos.java
 
     private String content;
-    public Memory(String content) {
-        this.content = content;
+    public Memory() {
+
     }
     private String[] data = { "Apple", "Banana", "Orange", "Watermelon",
             "Pear", "Grape", "Pineapple", "Strawberry", "Cherry", "Mango" };

@@ -1,32 +1,40 @@
 package hitcs.fghz.org.album;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
 import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.speech.tts.Voice;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
-
+import org.tensorflow.demo.Classifier;
+import org.tensorflow.demo.TensorFlowImageClassifier;
 import com.google.gson.Gson;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
@@ -36,10 +44,11 @@ import com.iflytek.cloud.ui.RecognizerDialog;
 import com.iflytek.cloud.ui.RecognizerDialogListener;
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 /**
  * 主活动
@@ -93,9 +102,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private Uri contentUri;
     private File newFile;
 
+    // tensorflow
 
 
-    private String last_click = "PHOTO";
+    //private TensorFlowImageClassifier classifier;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +124,16 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
+        if (Config.classifier == null) {
+            Config.classifier = new TensorFlowImageClassifier();
+            try {
+                Config.classifier.initializeTensorFlow(
+                        getAssets(), Config.MODEL_FILE, Config.LABEL_FILE, Config.NUM_CLASSES, Config.INPUT_SIZE, Config.IMAGE_MEAN, Config.IMAGE_STD,
+                        Config.INPUT_NAME, Config.OUTPUT_NAME);
+            } catch (final IOException e) {
+                ;
+            }
+        }
         fManager = getFragmentManager();
         // 绑定事件
         bindViews();
@@ -120,7 +142,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         //创建语音配置对象
         SpeechUtility.createUtility(this, SpeechConstant.APPID+"=5867596e");
     }
-
     /**
      * 生成动作栏上的菜单项目
      * @param menu
@@ -133,7 +154,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         MenuItem searchItem = menu.findItem(R.id.action_search);
         return super.onCreateOptionsMenu(menu);
     }
-
     /**
      * 监听菜单栏目的动作，当按下不同的按钮执行相应的动作
      *
@@ -218,8 +238,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            ClipData clip =
-                    ClipData.newUri(getContentResolver(), "A photo", contentUri);
+            ClipData clip = ClipData.newUri(getContentResolver(), "A photo", contentUri);
             intent.setClipData(clip);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         } else {
@@ -237,6 +256,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
     // 接受拍照的结果
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -246,13 +266,50 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 //获取contentProvider图片
                 mInputPFD = contentProvider.openFileDescriptor(contentUri, "r");
                 FileDescriptor fileDescriptor = mInputPFD.getFileDescriptor();
-                System.out.println("here");
-               // mImageView.setImageBitmap(BitmapFactory.decodeFileDescriptor(fileDescriptor));
-            } catch (FileNotFoundException e) {
+
+                final Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dealPics(bitmap);
+                    }
+                }).start();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void dealPics(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float scaleWidth = ((float) Config.INPUT_SIZE) / width;
+        float scaleHeight = ((float) Config.INPUT_SIZE) / height;
+        Matrix matrix = new Matrix();
+
+        matrix.postScale(scaleWidth, scaleHeight);
+        Bitmap newbm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+
+
+        final List<Classifier.Recognition> results = Config.classifier.recognizeImage(newbm);
+        for (final Classifier.Recognition result : results) {
+            System.out.println("Result: " + result.getTitle());
+        }
+//        TextView mResultText = (TextView)findViewById(R.id.bb);
+//        mResultText.setText("Detected = " + results.get(0).getTitle());
+
+        Log.d("Detected = ", String.valueOf(results));
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.a)
+                        .setContentTitle("新的照片")
+                        .setContentText(String.valueOf(results));
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(1, mBuilder.build());
+
     }
 
 
@@ -302,7 +359,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 // 可以使用其他方法，这个方法不好，下面相同
                 getFragmentManager().popBackStack();
                 if(photos == null){
-                    photos = new Photos("All Photos Here");
+                    photos = new Photos();
                     fTransaction.add(R.id.ly_content,photos);
                 }else{
                     fTransaction.show(photos);
@@ -315,7 +372,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 txt_memory.setSelected(true);
                 getFragmentManager().popBackStack();
                 if(memory == null){
-                    memory = new Memory("Take A Photo");
+                    memory = new Memory();
                     fTransaction.add(R.id.ly_content, memory);
                 }else{
                     fTransaction.show(memory);

@@ -1,4 +1,4 @@
-package hitcs.fghz.org.album;
+package hitcs.fghz.org.album.utils;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;

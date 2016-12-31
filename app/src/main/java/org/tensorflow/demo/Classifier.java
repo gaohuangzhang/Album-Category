@@ -17,6 +17,8 @@ package org.tensorflow.demo;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**

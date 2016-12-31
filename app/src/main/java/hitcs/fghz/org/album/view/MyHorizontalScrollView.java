@@ -76,7 +76,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
     /**
      * 当前第一张图片的下标
      */
-    private int mFristIndex;
+    private int mFristIndex = 0;
     /**
      * 当前第一个View
      */
@@ -154,13 +154,18 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
     protected void loadPreImg()
     {
         //如果当前已经是第一张，则返回
-        if (mFristIndex == 0)
+        if (mFristIndex == 0) {
+            Log.d("MyHorizon: ", "didn't load, had returned");
             return;
+        }
+        Log.d("MyHorizon: ", "first location: " + mFristIndex);
+        Log.d("MyHorizon: ", "last location: " + mCurrentIndex);
         //获得当前应该显示为第一张图片的下标
         int index = mCurrentIndex - mCountOneScreen;
         if (index >= 0)
         {
-//          mContainer = (LinearLayout) getChildAt(0);
+
+           mContainer = (LinearLayout) getChildAt(0);
             //移除最后一张
             int oldViewPos = mContainer.getChildCount() - 1;
             mViewPos.remove(mContainer.getChildAt(oldViewPos));
@@ -196,6 +201,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
             mContainer.getChildAt(i).setBackgroundColor(Color.WHITE);
         }
 
+
         mListener.onCurrentImgChanged(mFristIndex, mContainer.getChildAt(0));
 
     }
@@ -205,7 +211,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
      *
      * @param mAdapter
      */
-    public void initDatas(HorizontalScrollViewAdapter mAdapter)
+    public void initDatas(HorizontalScrollViewAdapter mAdapter, int position)
     {
         this.mAdapter = mAdapter;
         mContainer = (LinearLayout) getChildAt(0);
@@ -234,7 +240,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
 
         }
         //初始化第一屏幕的元素
-        initFirstScreenChildren(mCountOneScreen);
+        initFirstScreenChildren(mCountOneScreen, position);
     }
 
     /**
@@ -242,20 +248,28 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
      *
      * @param mCountOneScreen
      */
-    public void initFirstScreenChildren(int mCountOneScreen)
+    public void initFirstScreenChildren(int mCountOneScreen, int position)
     {
         mContainer = (LinearLayout) getChildAt(0);
         mContainer.removeAllViews();
         mViewPos.clear();
+        mFristIndex = position;
 
-        for (int i = 0; i < mCountOneScreen; i++)
+
+
+        int start = position;
+        int end = position + mCountOneScreen;
+        View view;
+
+        for (int i = start ; i < end; i++)
         {
-            View view = mAdapter.getView(i, null, mContainer);
+            view = mAdapter.getView(i, null, mContainer);
             view.setOnClickListener(this);
             mContainer.addView(view);
             mViewPos.put(view, i);
             mCurrentIndex = i;
         }
+
 
         if (mListener != null)
         {
@@ -276,11 +290,13 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
                 // 如果当前scrollX为view的宽度，加载下一张，移除第一张
                 if (scrollX >= mChildWidth)
                 {
+                    Log.d("MyHorizon: ", "forward");
                     loadNextImg();
                 }
                 // 如果当前scrollX = 0， 往前设置一张，移除最后一张
                 if (scrollX == 0)
                 {
+                    Log.d("MyHorizon: ", "backward");
                     loadPreImg();
                 }
                 break;
@@ -295,6 +311,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
         {
             for (int i = 0; i < mContainer.getChildCount(); i++)
             {
+                Log.d("Touch", "touch");
                 mContainer.getChildAt(i).setBackgroundColor(Color.WHITE);
             }
             mOnClickListener.onClick(v, mViewPos.get(v));
