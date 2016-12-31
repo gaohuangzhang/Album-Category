@@ -131,7 +131,7 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
         } catch (Exception e) {
             Log.d("ERROR: ", "" + e);
         }
-        Log.d("Test: ", "" + position_now + " " + url);
+        Log.d("Test-----------------: ", "" + position_now + " " + url);
     }
     //UI组件初始化与事件绑定
     private void bindViews() {
@@ -180,9 +180,17 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
                 break;
             case R.id.action_about:
                 Intent intent = new Intent(this, PhotoInfoActivity.class);
-//                Log.d("Position", ""+position);
-                intent.putExtra("position", position_now);
-                intent.putExtra("url", (String)mDatas.get(position_now).get("_data"));
+                int position;
+                if (!init) {
+                    position = position_now;
+                    Log.d("LOCATION-------", position + " " + position_now);
+                } else {
+                    position =  mHorizontalScrollView.getmShowIndex();
+                    Log.d("LOCATION-------", position + " fuck");
+                }
+                Log.d("LOCATION-------", position + " ");
+                intent.putExtra("position", position);
+                intent.putExtra("url", (String)mDatas.get(position).get("_data"));
                 startActivity(intent);
                 break;
 

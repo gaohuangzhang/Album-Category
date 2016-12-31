@@ -88,9 +88,13 @@ public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
             if (bmp != null) {
                 holder.iv_thumbnail.setImageBitmap(bmp);
             } else {
-                loadThumBitmap(imgUrl, photo);
-                bmp = (Bitmap) mImageCache.get(imgUrl);
-                holder.iv_thumbnail.setImageBitmap(bmp);
+                try {
+                    loadThumBitmap(imgUrl, photo);
+                    bmp = (Bitmap) mImageCache.get(imgUrl);
+                    holder.iv_thumbnail.setImageBitmap(bmp);
+                } catch (Exception e) {
+                    Log.d("Error:", "" + e);
+                }
             }
         }
         return convertView;
@@ -100,10 +104,14 @@ public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
         if (bitmap != null) {
             ;
         } else {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_4444;
-            bitmap = BitmapFactory.decodeFile(photo.getImageId(), options);
-            bitmap = extractThumbnail(bitmap, 320, 320);
+            try {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+                bitmap = BitmapFactory.decodeFile(photo.getImageId(), options);
+                bitmap = extractThumbnail(bitmap, 320, 320);
+            } catch (Exception e) {
+                Log.d("Error: " , " " + e);
+            }
         }
         mImageCache.put(url, bitmap);
         notifyDataSetChanged();

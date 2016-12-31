@@ -3,17 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <hitcs.fghz.org.album.view.SquareLayout
-        android:id="@+id/layout_icon"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
 
         <ImageView
             android:id="@+id/photo_target"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY" />
-    </hitcs.fghz.org.album.view.SquareLayout>
+            android:layout_height="300dp"
+            android:layout_margin="20dp"
+             />
+
 
     <TextView
         android:text="TextView"

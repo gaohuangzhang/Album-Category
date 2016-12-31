@@ -94,6 +94,11 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
      */
     private int mScreenWitdh;
 
+    /**
+     *  现在大图位置
+     */
+    private int mShowIndex;
+
 
     /**
      * 保存View与位置的键值对
@@ -141,6 +146,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
 
         //当前第一张图片小标
         mFristIndex++;
+        mShowIndex++;
         //如果设置了滚动监听则触发
         if (mListener != null)
         {
@@ -181,6 +187,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
             //当前位置--，当前第一个显示的下标--
             mCurrentIndex--;
             mFristIndex--;
+            mShowIndex--;
             //回调
             if (mListener != null)
             {
@@ -254,6 +261,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
         mContainer.removeAllViews();
         mViewPos.clear();
         mFristIndex = position;
+        mShowIndex = position;
 
 
 
@@ -303,6 +311,9 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
         }
         return super.onTouchEvent(ev);
     }
+    public int getmShowIndex() {
+        return mShowIndex;
+    }
 
     @Override
     public void onClick(View v)
@@ -311,12 +322,14 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
         {
             for (int i = 0; i < mContainer.getChildCount(); i++)
             {
-                Log.d("Touch", "touch");
+
                 mContainer.getChildAt(i).setBackgroundColor(Color.WHITE);
             }
+            mShowIndex =  mViewPos.get(v);
             mOnClickListener.onClick(v, mViewPos.get(v));
         }
     }
+
 
     public void setOnItemClickListener(OnItemClickListener mOnClickListener)
     {
