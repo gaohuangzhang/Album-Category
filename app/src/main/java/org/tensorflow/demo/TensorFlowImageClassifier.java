@@ -32,7 +32,7 @@ import java.util.Vector;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 /** A classifier specialized to label images using TensorFlow. */
-public class TensorFlowImageClassifier implements Classifier {
+public class TensorFlowImageClassifier implements Classifier{
   static {
     System.loadLibrary("tensorflow_demo");
   }

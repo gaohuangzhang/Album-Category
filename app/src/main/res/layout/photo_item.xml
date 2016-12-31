@@ -1,10 +1,17 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+
+    <hitcs.fghz.org.album.view.SquareLayout
+        android:id="@+id/layout_icon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
     <ImageView
         android:id="@+id/photo_small"
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="150dp" />
-</LinearLayout>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY" />
+    </hitcs.fghz.org.album.view.SquareLayout>
+</RelativeLayout>

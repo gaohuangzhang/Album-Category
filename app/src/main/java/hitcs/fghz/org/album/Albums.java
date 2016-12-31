@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import org.tensorflow.demo.TensorFlowImageClassifier;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class Albums extends Fragment {
     private String content;
     private FragmentManager manager;
     private FragmentTransaction ft;
+
 
     public Albums() {
     }
@@ -49,7 +52,7 @@ public class Albums extends Fragment {
                 // 进入一个新的fregment，这个fregment就是photos.java
                 // photos.java中显示具体相册的具体照片
                 //创建新的photos对象，初始数值qq暂时没有用， 可以定义为相册id等，但是需要进一步修改
-                Photos myJDEditFragment = new Photos("qq");
+                Photos myJDEditFragment = new Photos();
                 ft = manager.beginTransaction();
                 ft.add(R.id.ly_content , myJDEditFragment);
                 ft.setTransition(FragmentTransaction. TRANSIT_FRAGMENT_OPEN);
