@@ -39,10 +39,15 @@ import org.tensorflow.demo.TensorFlowImageClassifier;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
+
+import static hitcs.fghz.org.album.utils.ImagesScaner.updateGallery;
 
 /**
  * 主活动
@@ -95,6 +100,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
     // camera
     private Uri contentUri;
     private File newFile;
+    public static ActionBar actionBar;
+
+    private FragmentTransaction fTransaction;
 
     // tensorflow
 
@@ -107,11 +115,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // ui界面最上边的动作栏
-        ActionBar actionBar = getActionBar();
-        // 用于显示相应的属性
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar = getActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setTitle(" 相簿");
         // 生成布局
         setContentView(R.layout.activity_main);
         // 申请相机权限
@@ -159,6 +167,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 // 返回
                 System.out.println("title");
                 getFragmentManager().popBackStack();
+                actionBar.setDisplayHomeAsUpEnabled(false);
+                actionBar.setTitle(" 相册");
                 break;
             case R.id.action_search:
                 // 搜索
@@ -219,14 +229,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
             try {
                 //获取contentProvider图片
                 mInputPFD = contentProvider.openFileDescriptor(contentUri, "r");
-                FileDescriptor fileDescriptor = mInputPFD.getFileDescriptor();
+                final FileDescriptor fileDescriptor = mInputPFD.getFileDescriptor();
 
-                final Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        dealPics(bitmap);
+                        dealPics(fileDescriptor);
                     }
                 }).start();
             } catch (Exception e) {
@@ -236,7 +246,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void dealPics(Bitmap bitmap) {
+    private void dealPics(FileDescriptor fileDescriptor) {
+        Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         float scaleWidth = ((float) Config.INPUT_SIZE) / width;
@@ -254,6 +265,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 //        TextView mResultText = (TextView)findViewById(R.id.bb);
 //        mResultText.setText("Detected = " + results.get(0).getTitle());
 
+        saveImage("", bitmap);
         Log.d("Detected = ", String.valueOf(results));
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -264,6 +276,34 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(1, mBuilder.build());
 
+    }
+    private void saveImage(String type, Bitmap bitmap) {
+        FileOutputStream b = null;
+        File file = new File("/sdcard/myImage/");
+        file.mkdirs();// 创建文件夹，名称为myimage
+        String str=null;
+        Date date=null;
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");//获取当前时间，进一步转化为字符串
+        date =new Date();
+        str=format.format(date);
+        String fileName = "/sdcard/myImage/"+str+".jpg";
+
+        try {
+            b = new FileOutputStream(fileName);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                b.flush();
+                b.close();
+                updateGallery(MainActivity.this, fileName);
+                photos.onResume();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -302,11 +342,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
 
-        FragmentTransaction fTransaction = fManager.beginTransaction();
+        fTransaction = fManager.beginTransaction();
         hideAllFragment(fTransaction);
         switch (v.getId()){
             // 照片
             case R.id.all_photos:
+                actionBar.setDisplayHomeAsUpEnabled(false);
+                actionBar.setTitle(" 相簿");
+
                 setSelected();
                 txt_photos.setSelected(true);
                 // 暂时使用弹出堆栈，以避免从相簿进入相册无法返回
@@ -322,6 +365,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
             // 回忆
             case R.id.memory:
+                // 用于显示相应的属性
+
+                actionBar.setTitle(" 回忆");
+                actionBar.setDisplayHomeAsUpEnabled(false);
                 setSelected();
                 txt_memory.setSelected(true);
                 getFragmentManager().popBackStack();
@@ -334,6 +381,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
             // 相册
             case R.id.all_albums:
+                actionBar.setTitle(" 相册");
+                actionBar.setDisplayHomeAsUpEnabled(false);
                 setSelected();
                 txt_albums.setSelected(true);
                 getFragmentManager().popBackStack();

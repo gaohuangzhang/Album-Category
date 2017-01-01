@@ -1,5 +1,6 @@
 package hitcs.fghz.org.album;
 
+import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -56,6 +57,13 @@ public class Albums extends Fragment {
                 ft = manager.beginTransaction();
                 ft.add(R.id.ly_content , myJDEditFragment);
                 ft.setTransition(FragmentTransaction. TRANSIT_FRAGMENT_OPEN);
+                try {
+                    ActionBar actionBar = MainActivity.actionBar;
+                    actionBar.setDisplayHomeAsUpEnabled(true);
+                    actionBar.setTitle(" 返回相册");
+                } catch (Exception e) {
+                    ;
+                }
                 ft.addToBackStack( null);
                 ft.commit();
             }

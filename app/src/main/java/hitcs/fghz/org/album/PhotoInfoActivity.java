@@ -7,13 +7,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import org.tensorflow.demo.Classifier;
 import org.tensorflow.demo.TensorFlowImageClassifier;
@@ -21,6 +24,8 @@ import org.tensorflow.demo.TensorFlowImageClassifier;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import hitcs.fghz.org.album.adapter.PhotoTypeAdapter;
 
 import static android.media.ThumbnailUtils.extractThumbnail;
 
@@ -33,9 +38,12 @@ public class PhotoInfoActivity extends Activity {
     private String url;
     private int position_now;
 
+    private List<Classifier.Recognition> results;
+
     PhotoInfoActivity() {
 
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +54,7 @@ public class PhotoInfoActivity extends Activity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle("相关信息");
         // 生成布局
         setContentView(R.layout.photo_info);
         // get intent information
@@ -57,7 +66,39 @@ public class PhotoInfoActivity extends Activity {
 
         ImageView iv = (ImageView) findViewById(R.id.photo_target);
         iv.setImageURI(Uri.fromFile(new File(url)));
-//        TextView tv = (TextView) findViewById()
+        new UpdateListView().execute();
+
+    }
+    /**
+     * 生成动作栏上的菜单项目
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_about, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    /**
+     * 监听菜单栏目的动作，当按下不同的按钮执行相应的动作
+     *
+     * @param item
+     * @return
+     */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO Auto-generated method stub
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // 返回
+                System.out.println("title");
+                this.finish();
+                break;
+
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
     protected void getMessage() {
         Intent intent = getIntent();
@@ -107,10 +148,34 @@ public class PhotoInfoActivity extends Activity {
         Bitmap newbm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 
 
-        final List<Classifier.Recognition> results = Config.classifier.recognizeImage(newbm);
+
+        results = Config.classifier.recognizeImage(newbm);
+
         Log.d("Result", String.valueOf(results));
-        for (final Classifier.Recognition result : results) {
-            System.out.println("Result: " + result.getTitle());
+    }
+    class UpdateListView extends AsyncTask<String, String, String>
+    {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                while (results == null) {
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            // TODO Auto-generated method stub
+            if (results != null) {
+                ListView lv = (ListView) findViewById(R.id.photo_type_list);
+                PhotoTypeAdapter adapter = new PhotoTypeAdapter(PhotoInfoActivity.this, R.layout.type_item, results);
+                lv.setAdapter(adapter);
+            }
         }
     }
 }
+

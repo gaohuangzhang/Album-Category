@@ -4,6 +4,7 @@ package hitcs.fghz.org.album;
  * 这个就是进入app之后的第一个界面
  * Created by me on 16-12-19.
  */
+import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -36,6 +38,7 @@ public class Photos extends Fragment {
     GridView gridView;
     private int start_index, end_index;
     private boolean isInit = false;
+    private boolean scoll = false;
 
 
     public Photos() {
@@ -55,6 +58,11 @@ public class Photos extends Fragment {
         // 讲相片元素与相片数组用适配器组合
         PhotoAdapter adapter = new PhotoAdapter(getActivity(), R.layout.photo_item, photoList);
         gridView.setAdapter(adapter);
+        if (!scoll) {
+            ;
+        } else {
+            ;
+        }
 
         // 设定点击事件，当点击某一个相片，返回照片在list的位置
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,7 +77,30 @@ public class Photos extends Fragment {
                 startActivity(intent);
             }
         });
+
+        gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if(scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){
+                    scoll = false;
+                    Log.d("Scroll", "no");
+                }else{
+                    scoll = true;
+                    Log.d("Scroll", "yes");
+                }
+            }
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
         return view;
+    }
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        initPhoto();
     }
     // 初始化照片数组
     private void initPhoto() {

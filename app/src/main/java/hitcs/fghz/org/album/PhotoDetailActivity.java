@@ -78,6 +78,7 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(" 相簿");
         // 绑定textview按钮
         bindViews();
 

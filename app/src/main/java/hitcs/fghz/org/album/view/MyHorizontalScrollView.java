@@ -146,7 +146,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
 
         //当前第一张图片小标
         mFristIndex++;
-        mShowIndex++;
+        mShowIndex = mFristIndex;
         //如果设置了滚动监听则触发
         if (mListener != null)
         {
@@ -187,7 +187,7 @@ public class MyHorizontalScrollView extends HorizontalScrollView implements
             //当前位置--，当前第一个显示的下标--
             mCurrentIndex--;
             mFristIndex--;
-            mShowIndex--;
+            mShowIndex = mFristIndex;
             //回调
             if (mListener != null)
             {

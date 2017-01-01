@@ -120,7 +120,7 @@ public  class ImagesScaner {
         return picturemaps;
     }
 
-    private static void updateGallery(Context con, String filename)//filename是我们的文件全名，包括后缀哦
+    public static void updateGallery(Context con, String filename)//filename是我们的文件全名，包括后缀哦
     {
         MediaScannerConnection.scanFile(con,
             new String[] { filename }, null,
