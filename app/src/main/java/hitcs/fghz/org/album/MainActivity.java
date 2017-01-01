@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 
 import org.tensorflow.demo.Classifier;
@@ -297,9 +298,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             try {
                 b.flush();
                 b.close();
-                updateGallery(MainActivity.this, fileName);
-                photos.onResume();
-
+                photos.onReflash(fileName);
             } catch (IOException e) {
                 e.printStackTrace();
             }

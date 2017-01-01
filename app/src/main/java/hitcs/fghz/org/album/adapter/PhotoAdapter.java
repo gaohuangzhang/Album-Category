@@ -31,6 +31,9 @@ public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
     LayoutInflater mInflater;
     List<PhotoItem> mImageList;
     boolean mBusy = false;
+    public void setMImageList(List<PhotoItem> mImageList) {
+        this.mImageList = mImageList;
+    }
 
     public PhotoAdapter(Context context, int textViewResourceId,
                         List<PhotoItem> objects) {
@@ -67,42 +70,48 @@ public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // 获取当前项的item实例
-        final PhotoItem photo= getItem(position);
-        // 保存当前信息
-        ViewHolder holder = null;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(resourceId, null);
-            holder = new ViewHolder();
-            holder.iv_thumbnail = (ImageView) convertView.findViewById(R.id.photo_small);
-            holder.thumbnail_url = photo.getImageId();
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-            if (!holder.thumbnail_url.equals(photo.getImageId())) {
-                holder.iv_thumbnail.setImageResource(R.drawable.loading);
-            }
-        }
-        if (!isBusy()) {
-            final String imgUrl = photo.getImageId();
-            Bitmap bmp = (Bitmap) mImageCache.get(imgUrl);
-            if (bmp != null) {
-                holder.iv_thumbnail.setImageBitmap(bmp);
+        try {
+            final PhotoItem photo = getItem(position);
 
+            // 保存当前信息
+            ViewHolder holder = null;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(resourceId, null);
+                holder = new ViewHolder();
+                holder.iv_thumbnail = (ImageView) convertView.findViewById(R.id.photo_small);
+                holder.thumbnail_url = photo.getImageId();
+                convertView.setTag(holder);
             } else {
-                try {
-//                    holder.iv_thumbnail.setImageResource(R.drawable.b);
-                    setBusy(true);
-
-                    loadThumBitmap(imgUrl, photo);
-                    bmp = (Bitmap) mImageCache.get(imgUrl);
-                    holder.iv_thumbnail.setImageBitmap(bmp);
-                    setBusy(false);
-
-                } catch (Exception e) {
-                    Log.d("Error:", "" + e);
+                holder = (ViewHolder) convertView.getTag();
+                if (!holder.thumbnail_url.equals(photo.getImageId())) {
+                    holder.iv_thumbnail.setImageResource(R.drawable.loading);
                 }
             }
+            if (!isBusy()) {
+                final String imgUrl = photo.getImageId();
+                Bitmap bmp = (Bitmap) mImageCache.get(imgUrl);
+                if (bmp != null) {
+                    holder.iv_thumbnail.setImageBitmap(bmp);
 
+                } else {
+                    try {
+//                    holder.iv_thumbnail.setImageResource(R.drawable.b);
+                        setBusy(true);
+
+                        loadThumBitmap(imgUrl, photo);
+                        bmp = (Bitmap) mImageCache.get(imgUrl);
+                        holder.iv_thumbnail.setImageBitmap(bmp);
+                        setBusy(false);
+
+                    } catch (Exception e) {
+                        Log.d("Error:", "" + e);
+                    }
+                }
+
+            }
+
+        } catch (Exception e) {
+            ;
         }
         return convertView;
     }
