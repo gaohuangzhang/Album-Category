@@ -45,10 +45,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
-import static hitcs.fghz.org.album.utils.ImagesScaner.updateGallery;
+import static hitcs.fghz.org.album.utils.ImagesScaner.prepareForApplication;
 
 /**
  * 主活动
@@ -98,20 +96,19 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private Albums albums;
     private FragmentManager fManager;
 
-    // camera
+    // for camera to save image
     private Uri contentUri;
     private File newFile;
-    public static ActionBar actionBar;
 
+    // actionBar
+    public static ActionBar actionBar;
+    // fragment
     private FragmentTransaction fTransaction;
 
     // tensorflow
+    // use static value in Config.java
 
-
-    //private TensorFlowImageClassifier classifier;
-
-
-
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +124,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
+        // init tensorflow
         if (Config.classifier == null) {
             Config.classifier = new TensorFlowImageClassifier();
             try {
@@ -137,6 +135,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 ;
             }
         }
+        prepareForApplication(this);
+
+        // fragment
         fManager = getFragmentManager();
         // 绑定事件
         bindViews();
@@ -144,7 +145,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         txt_photos.performClick();
     }
     /**
-     * 生成动作栏上的菜单项目
+     * ActionBar
      * @param menu
      * @return
      */
@@ -152,17 +153,16 @@ public class MainActivity extends Activity implements View.OnClickListener{
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+        // search item
         MenuItem searchItem = menu.findItem(R.id.action_search);
         return super.onCreateOptionsMenu(menu);
     }
     /**
      * 监听菜单栏目的动作，当按下不同的按钮执行相应的动作
-     *
      * @param item
      * @return
      */
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
         switch (item.getItemId()) {
             case android.R.id.home:
                 // 返回
@@ -180,7 +180,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 startCamera();
                 break;
                 // 语音
-
             default:
                 break;
         }
@@ -194,10 +193,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         File imagePath = new File(Environment.getExternalStorageDirectory(), "images");
         if (!imagePath.exists()) imagePath.mkdirs();
         newFile = new File(imagePath, "default_image.jpg");
-
         //第二参数是在manifest.xml定义 provider的authorities属性
         contentUri = FileProvider.getUriForFile(this, "hitcs.fghz.org.album.fileprovider", newFile);
-
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //兼容版本处理，因为 intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION) 只在5.0以上的版本有效
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -220,7 +217,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         startActivityForResult(intent, 1000);
     }
     // 接受拍照的结果
-
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -231,9 +227,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 //获取contentProvider图片
                 mInputPFD = contentProvider.openFileDescriptor(contentUri, "r");
                 final FileDescriptor fileDescriptor = mInputPFD.getFileDescriptor();
-
-
-
+                // new thread to deal image by tensorflow
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -246,28 +240,27 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
+    // deal image by tensorflow
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void dealPics(FileDescriptor fileDescriptor) {
         Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        // resize bitmap
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         float scaleWidth = ((float) Config.INPUT_SIZE) / width;
         float scaleHeight = ((float) Config.INPUT_SIZE) / height;
         Matrix matrix = new Matrix();
-
         matrix.postScale(scaleWidth, scaleHeight);
         Bitmap newbm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-
-
+        // get classifier information
         final List<Classifier.Recognition> results = Config.classifier.recognizeImage(newbm);
         for (final Classifier.Recognition result : results) {
             System.out.println("Result: " + result.getTitle());
         }
-//        TextView mResultText = (TextView)findViewById(R.id.bb);
-//        mResultText.setText("Detected = " + results.get(0).getTitle());
-
+        // call function to save image
         saveImage("", bitmap);
         Log.d("Detected = ", String.valueOf(results));
+        // show notification about tf information of image
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.a)
@@ -275,36 +268,41 @@ public class MainActivity extends Activity implements View.OnClickListener{
                         .setContentText(String.valueOf(results));
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, mBuilder.build());
+        mNotificationManager.notify(3, mBuilder.build());
 
     }
+    // save image
     private void saveImage(String type, Bitmap bitmap) {
         FileOutputStream b = null;
-        File file = new File("/sdcard/myImage/");
-        file.mkdirs();// 创建文件夹，名称为myimage
+        // save images to this location
+        File file = new File(Config.location);
+        // 创建文件夹 @ Config.location
+        file.mkdirs();
         String str=null;
         Date date=null;
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");//获取当前时间，进一步转化为字符串
+        // 获取当前时间，进一步转化为字符串
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         date =new Date();
         str=format.format(date);
-        String fileName = "/sdcard/myImage/"+str+".jpg";
+        String fileName = Config.location + str + ".jpg";
 
         try {
             b = new FileOutputStream(fileName);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
+            // 把数据写入文件
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
                 b.flush();
                 b.close();
+                // reflash the fragment of Photos
                 photos.onReflash(fileName);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-
 
     //UI组件初始化与事件绑定
     private void bindViews() {
@@ -346,6 +344,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         switch (v.getId()){
             // 照片
             case R.id.all_photos:
+                // set ActionBar tile && set no click action
                 actionBar.setDisplayHomeAsUpEnabled(false);
                 actionBar.setTitle(" 相簿");
 
@@ -365,7 +364,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             // 回忆
             case R.id.memory:
                 // 用于显示相应的属性
-
+                // same as photos
                 actionBar.setTitle(" 回忆");
                 actionBar.setDisplayHomeAsUpEnabled(false);
                 setSelected();
@@ -380,6 +379,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
             // 相册
             case R.id.all_albums:
+                // same as photos
                 actionBar.setTitle(" 相册");
                 actionBar.setDisplayHomeAsUpEnabled(false);
                 setSelected();

@@ -2,14 +2,11 @@ package hitcs.fghz.org.album;
 
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -28,10 +25,11 @@ import android.widget.TextView;
  * 点击照片后进入这个界面查看照片细节
  * Created by me on 16-12-20.
  */
+// tf
 import org.tensorflow.demo.TensorFlowImageClassifier;
-
+// some method may be used about db or others
 import static hitcs.fghz.org.album.utils.ImagesScaner.*;
-import hitcs.fghz.org.album.entity.PhotoItem;
+// adapter && view
 import hitcs.fghz.org.album.view.MyHorizontalScrollView;
 import hitcs.fghz.org.album.view.MyHorizontalScrollView.*;
 import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
@@ -51,44 +49,35 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
     private ImageView mImg;
     // 照片数组。照片在drawable文件夹中，名字为a.png ...
     private List<Map> mDatas ;
-
+    // which image
     int position_now = -1;
+    // image url
     String url = null;
-
+    // has been init
     boolean init = false;
 
-    TensorFlowImageClassifier classifier;
     PhotoDetailActivity() {
-        this.classifier = null;
-    }
 
-    PhotoDetailActivity(TensorFlowImageClassifier classifier) {
-        this.classifier = classifier;
     }
 
     // 重写创建活动的方法
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.fg_detail);
-
         ActionBar actionBar = getActionBar();
-        // 用于显示相应的属性
+        // 用于显示相应的属性 actonbar
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(" 相簿");
         // 绑定textview按钮
         bindViews();
-
+        // get photo list
         initPhoto();
-
-
         // 下面设置下面缩略图上面大图。
         mDatas = getMediaImageInfo(this.getBaseContext());
         mImg = (ImageView) findViewById(R.id.id_content);
-
         mHorizontalScrollView = (MyHorizontalScrollView) findViewById(R.id.id_horizontalScrollView);
         mAdapter = new HorizontalScrollViewAdapter(this, mDatas);
         //添加滚动回调
@@ -106,7 +95,6 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
                         Log.d("PhotoDetail: ", "Image change to: " + position);
                         mImg.setImageURI(Uri.fromFile(new File((String)mDatas.get(position).get("_data"))));
                         viewIndicator.setBackgroundColor(Color.parseColor("#AA024DA4"));
-//                        position_now = mHorizontalScrollView.get;
                     }
                 });
         //添加点击回调
@@ -125,7 +113,6 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
     }
     private void initPhoto() {
         Intent intent = getIntent();
-
         try {
             position_now = intent.getIntExtra("position", -1);
             url = intent.getStringExtra("url");
@@ -176,20 +163,18 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
         switch (item.getItemId()) {
             case android.R.id.home:
                 // 返回
-                System.out.println("title");
                 this.finish();
                 break;
             case R.id.action_about:
+                // go to PhotoInfoActivity
                 Intent intent = new Intent(this, PhotoInfoActivity.class);
                 int position;
                 if (!init) {
                     position = position_now;
-                    Log.d("LOCATION-------", position + " " + position_now);
                 } else {
                     position =  mHorizontalScrollView.getmShowIndex();
-                    Log.d("LOCATION-------", position + " fuck");
                 }
-                Log.d("LOCATION-------", position + " ");
+                // send args
                 intent.putExtra("position", position);
                 intent.putExtra("url", (String)mDatas.get(position).get("_data"));
                 startActivity(intent);

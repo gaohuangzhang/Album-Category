@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.Window;
 
 /**
+ * i plan use this activity as the first activity
+ * when open the app, you can see this page
+ * and the app can deal somethings at background
  * Created by me on 17-1-1.
  */
 
