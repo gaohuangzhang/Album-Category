@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,13 @@ import org.tensorflow.demo.TensorFlowImageClassifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import hitcs.fghz.org.album.entity.AlbumItem;
 import hitcs.fghz.org.album.adapter.AlbumAdapter;
+
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumInfo;
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumPhotos;
 
 /**
  * 相册的fregment 的具体动作
@@ -38,6 +43,8 @@ public class Albums extends Fragment {
             "Pear", "Grape", "Pineapple", "Strawberry", "Cherry", "Mango" };
     private List<AlbumItem> albumList = new ArrayList<AlbumItem>();
 
+    private List<Map<String, String>> result;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fg_albums,container,false);
@@ -53,7 +60,10 @@ public class Albums extends Fragment {
                 // 进入一个新的fregment，这个fregment就是photos.java
                 // photos.java中显示具体相册的具体照片
                 //创建新的photos对象，初始数值qq暂时没有用， 可以定义为相册id等，但是需要进一步修改
-                Photos myJDEditFragment = new Photos();
+
+                String type = result.get(position).get("album_name");
+                Log.d("Album_Name", type);
+                Photos myJDEditFragment = new Photos(type);
                 ft = manager.beginTransaction();
                 ft.add(R.id.ly_content , myJDEditFragment);
                 ft.setTransition(FragmentTransaction. TRANSIT_FRAGMENT_OPEN);
@@ -74,12 +84,15 @@ public class Albums extends Fragment {
 
     private void initAlbums() {
         AlbumItem album;
-        for (String s: data) {
-             album = new AlbumItem(s, R.drawable.girl);
+        if (getContext() == null)
+            Log.d("getContext() in Album", "null");
+        result = getAlbumInfo(getContext());
+        for (Map<String, String> s: result) {
+             album = new AlbumItem(s.get("album_name"), s.get("show_image"));
             albumList.add(album);
         }
-        album = new AlbumItem("Add", R.drawable.add);
-        albumList.add(album);
+//        album = new AlbumItem("Add", R.drawable.add);
+//        albumList.add(album);
 
     }
 }

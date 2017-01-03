@@ -7,16 +7,16 @@ package hitcs.fghz.org.album.entity;
 
 public class AlbumItem {
         private String name;
-        private int imageId;
-        public AlbumItem(String name, int imageId) {
+        private String url;
+        public AlbumItem(String name, String url) {
             this.name = name;
-            this.imageId = imageId;
+            this.url = url;
 
         }
         public String getName() {
             return name;
         }
-        public int getImageId() {
-            return imageId;
+        public String getImageId() {
+            return url;
         }
 }

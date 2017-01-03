@@ -55,6 +55,7 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
     String url = null;
     // has been init
     boolean init = false;
+    private String type = null;
 
     PhotoDetailActivity() {
 
@@ -75,8 +76,11 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
         bindViews();
         // get photo list
         initPhoto();
+        if (type != null)
+            mDatas = getAlbumPhotos(this, this.type);
         // 下面设置下面缩略图上面大图。
-        mDatas = getMediaImageInfo(this.getBaseContext());
+        else
+            mDatas = getMediaImageInfo(this.getBaseContext());
         mImg = (ImageView) findViewById(R.id.id_content);
         mHorizontalScrollView = (MyHorizontalScrollView) findViewById(R.id.id_horizontalScrollView);
         mAdapter = new HorizontalScrollViewAdapter(this, mDatas);
@@ -94,6 +98,7 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
                         }
                         Log.d("PhotoDetail: ", "Image change to: " + position);
                         mImg.setImageURI(Uri.fromFile(new File((String)mDatas.get(position).get("_data"))));
+
                         viewIndicator.setBackgroundColor(Color.parseColor("#AA024DA4"));
                     }
                 });
@@ -105,6 +110,7 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
             public void onClick(View view, int position)
             {
                 mImg.setImageURI(Uri.fromFile(new File((String)mDatas.get(position).get("_data"))));
+
                 view.setBackgroundColor(Color.parseColor("#AA024DA4"));
             }
         });
@@ -116,6 +122,8 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
         try {
             position_now = intent.getIntExtra("position", -1);
             url = intent.getStringExtra("url");
+            type = intent.getStringExtra("type");
+
         } catch (Exception e) {
             Log.d("ERROR: ", "" + e);
         }

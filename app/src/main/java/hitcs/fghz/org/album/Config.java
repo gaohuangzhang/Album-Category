@@ -26,4 +26,6 @@ public class Config {
     // database
     public static MyDatabaseHelper dbHelper;
     public static int dbversion = 5;
+
+    public static boolean workdone = false;
 }

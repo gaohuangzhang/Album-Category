@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -45,6 +46,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import hitcs.fghz.org.album.dao.MyDatabaseHelper;
 
 import static hitcs.fghz.org.album.utils.ImagesScaner.prepareForApplication;
 
@@ -258,8 +261,21 @@ public class MainActivity extends Activity implements View.OnClickListener{
             System.out.println("Result: " + result.getTitle());
         }
         // call function to save image
-        saveImage("", bitmap);
+        String url = saveImage("", bitmap);
         Log.d("Detected = ", String.valueOf(results));
+        // update db
+        Config.dbHelper = new MyDatabaseHelper(this, "Album.db", null, Config.dbversion);
+        SQLiteDatabase db = Config.dbHelper.getWritableDatabase();
+        ContentValues values_ablum = new ContentValues();
+        values_ablum.put("album_name", results.get(0).getTitle());
+        values_ablum.put("show_image", url);
+        db.insert("Album", null, values_ablum);
+        ContentValues values = new ContentValues();
+        values.put("album_name", results.get(0).getTitle());
+        values.put("url", url);
+        db.insert("AlbumPhotos", null, values);
+        db.close();
+
         // show notification about tf information of image
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -272,7 +288,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     }
     // save image
-    private void saveImage(String type, Bitmap bitmap) {
+    private String saveImage(String type, Bitmap bitmap) {
         FileOutputStream b = null;
         // save images to this location
         File file = new File(Config.location);
@@ -297,11 +313,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 b.flush();
                 b.close();
                 // reflash the fragment of Photos
+                Config.workdone = false;
                 photos.onReflash(fileName);
+                Config.workdone = false;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        return fileName;
     }
 
     //UI组件初始化与事件绑定

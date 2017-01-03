@@ -101,6 +101,7 @@ public  class ImagesScaner {
             cursor.close();
 
         }
+        db.close();
 
 
     }
@@ -121,41 +122,50 @@ public  class ImagesScaner {
         Log.d("Result", String.valueOf(results));
     }
 
-    public static List<Map<String, String>> getAlbumPhotos(Context ctx, String name) {
-        List<Map<String, String>> result = null;
-        Config.dbHelper = new MyDatabaseHelper(ctx, "AlbumPhotos.db", null, Config.dbversion);
-        SQLiteDatabase db = Config.dbHelper.getWritableDatabase();
+    public static List<Map> getAlbumPhotos(Context ctx, String name) {
+        List<Map> result = new ArrayList<>();
+        MyDatabaseHelper dbHelper = new MyDatabaseHelper(ctx, "Album.db", null, Config.dbversion);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor cursor = null;
         cursor = db.query("AlbumPhotos", null, "album_name = '" + name + "'", null, null, null, null);
-        if (!cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
+            Map<String, String> tmp;
             do {
-                Map<String, String> tmp = null;
+                tmp = new HashMap<>();
                 String album_name = cursor.getString(cursor.getColumnIndex("album_name"));
                 String url = cursor.getString(cursor.getColumnIndex("url"));
                 tmp.put("album_name", album_name);
                 tmp.put("url", url);
+                tmp.put("_data", url);
                 result.add(tmp);
             } while (cursor.moveToNext());
         }
-
+        cursor.close();
+        db.close();
         return result;
     }
     public static List<Map<String, String>> getAlbumInfo(Context ctx) {
-        List<Map<String, String>> result = null;
+        List<Map<String, String>> result = new ArrayList<>();
         Config.dbHelper = new MyDatabaseHelper(ctx, "Album.db", null, Config.dbversion);
         SQLiteDatabase db = Config.dbHelper.getWritableDatabase();
         Cursor cursor = null;
         cursor = db.query("Album", null, null, null, null, null, null);
-        if (!cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
+            Map<String, String> tmp;
             do {
-                Map<String, String> tmp = null;
+                tmp = new HashMap<>();;
                 String album_name = cursor.getString(cursor.getColumnIndex("album_name"));
                 String url = cursor.getString(cursor.getColumnIndex("show_image"));
                 tmp.put("album_name", album_name);
                 tmp.put("show_image", url);
                 result.add(tmp);
+                Log.d("ITEM", String.valueOf(tmp));
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        db.close();
+
+        Log.d("Album info", "END");
         return result;
     }
     public static List<Map> getMediaImageInfo(Context ctx) {
@@ -277,6 +287,7 @@ public  class ImagesScaner {
                 public void onScanCompleted(String path, Uri uri) {
                     Log.i("ExternalStorage", "Scanned " + path + ":");
                     Log.i("ExternalStorage", "-> uri=" + uri);
+                    Config.workdone = true;
                 }
             });
     }

@@ -24,21 +24,33 @@ import hitcs.fghz.org.album.entity.PhotoItem;
 // 照片元素的适配器， 对于gridview需要适配器将数据传递给布局显示
 import hitcs.fghz.org.album.adapter.PhotoAdapter;
 // static method: get all photo
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumInfo;
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumPhotos;
 import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
 // static method: when save image you need to update the db by this
 import static hitcs.fghz.org.album.utils.ImagesScaner.updateGallery;
 
 public class Photos extends Fragment {
     // show 所有照片  或者  某个相册
-    private String type;
+    private String type = null;
     private List<PhotoItem> photoList = new ArrayList<PhotoItem>();
     // 声明一个gridview
     private GridView gridView;
     private boolean isInit = false;
     private boolean scoll = false;
     private PhotoAdapter adapter;
+
+    List<Map> result;
     // 空的构造函数
     public Photos() {
+        this.type = null;
+        Log.d("in this album", "null constructer");
+    }
+    public Photos(String type) {
+        this.type = type;
+        Log.d("in this album", "type is not null");
+        if (getContext() == null) Log.d("getContext", "Null");
+
     }
     // 重写创建fregement方法
     @Override
@@ -46,6 +58,8 @@ public class Photos extends Fragment {
 
         View view = inflater.inflate(R.layout.fg_photos,container,false);
         gridView = (GridView) view.findViewById(R.id.gridView1);
+        if (type != null)
+            this.result = getAlbumPhotos(getContext(), this.type);
         // 获得照片数据
         initPhoto();
         // 获得gridview
@@ -53,6 +67,7 @@ public class Photos extends Fragment {
         // 讲相片元素与相片数组用适配器组合
         adapter = new PhotoAdapter(getActivity(), R.layout.photo_item, photoList);
         gridView.setAdapter(adapter);
+
         // 正在滑动 或者 静止
         if (!scoll) {
             ;
@@ -71,6 +86,7 @@ public class Photos extends Fragment {
                 Log.d("Position", ""+position);
                 // send value
                 intent.putExtra("position", position);
+                intent.putExtra("type", type);
                 intent.putExtra("url", photoList.get(position).getImageId());
                 // start
                 startActivity(intent);
@@ -86,15 +102,28 @@ public class Photos extends Fragment {
     }
     // 初始化照片数组
     private void initPhoto() {
-        final List<Map> mediaImageInfo;
-        mediaImageInfo = getMediaImageInfo(getContext());
         PhotoItem photo;
-        for (Map<String, String> map : mediaImageInfo) {
-            // in this map, the key of url is _data
-            String url = map.get("_data");
-            if (url != null) {
-                photo = new PhotoItem(url);
-                photoList.add(photo);
+        if (type == null) {
+            final List<Map> mediaImageInfo;
+            mediaImageInfo = getMediaImageInfo(getContext());
+
+            for (Map<String, String> map : mediaImageInfo) {
+                // in this map, the key of url is _data
+                String url = map.get("_data");
+                if (url != null) {
+                    photo = new PhotoItem(url);
+                    photoList.add(photo);
+                }
+            }
+        }
+        else {
+            for (Map<String, String> map : result) {
+                // in this map, the key of url is _data
+                String url = map.get("url");
+                if (url != null) {
+                    photo = new PhotoItem(url);
+                    photoList.add(photo);
+                }
             }
         }
     }
@@ -113,7 +142,9 @@ public class Photos extends Fragment {
                 updateGallery(getContext(), fileName);
                 // we don't know the time when update db is end (it works in another thread)
                 // so now i set a time to wait it finished (it is a bad way)
-                Thread.sleep(2000);
+                while (!Config.workdone) {
+                    Thread.sleep(10);
+                }
                 // clear list
                 photoList.clear();
                 // get photo
