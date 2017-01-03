@@ -24,6 +24,7 @@ import android.os.Environment;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
@@ -33,12 +34,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.tensorflow.demo.Classifier;
 import org.tensorflow.demo.TensorFlowImageClassifier;
 import com.google.gson.Gson;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechRecognizer;
 import com.iflytek.cloud.SpeechUtility;
 import com.iflytek.cloud.ui.RecognizerDialog;
 import com.iflytek.cloud.ui.RecognizerDialogListener;
@@ -139,8 +143,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         bindViews();
         //模拟一次点击，既进去后选择第一项
         txt_photos.performClick();
-        //创建语音配置对象
-        SpeechUtility.createUtility(this, SpeechConstant.APPID+"=5867596e");
     }
     /**
      * 生成动作栏上的菜单项目
@@ -189,37 +191,29 @@ public class MainActivity extends Activity implements View.OnClickListener{
      * 语音识别
      */
     private void startRecord() {
-        RecognizerDialog mDialog = new RecognizerDialog(this, null);
-        mDialog.setParameter(SpeechConstant.DOMAIN, "iat");
-        mDialog.setParameter(SpeechConstant.LANGUAGE, "zh-cn");
-        mDialog.setParameter(SpeechConstant.ACCENT, "mandarin");
+        //创建语音配置对象
+        SpeechUtility.createUtility(MainActivity.this, SpeechConstant.APPID+"=5867596e");
+        SpeechRecognizer mIat = SpeechRecognizer.createRecognizer(MainActivity.this, null);
+        RecognizerDialog mDialog = new RecognizerDialog(MainActivity.this, null);
+        mIat.setParameter(SpeechConstant.DOMAIN, "iat");
+        mIat.setParameter(SpeechConstant.LANGUAGE, "zh-cn");
+        mIat.setParameter(SpeechConstant.ACCENT, "mandarin");
         mDialog.setListener(new RecognizerDialogListener() {
             @Override
             public void onResult(RecognizerResult recognizerResult, boolean b) {
-                if (!b) {
-                    parseVoice(recognizerResult.getResultString());
-                }
+                Log.d("Result", recognizerResult.getResultString());
+                String text = JsonParser.parseIatResult(recognizerResult.getResultString());
+                System.out.print(text);
+                Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(SpeechError speechError) {
-
+                speechError.getPlainDescription(true);
             }
         });
         mDialog.show();
         Toast.makeText(this, "请开始说话", Toast.LENGTH_SHORT).show();
-    }
-
-    private void parseVoice(String resultString) {
-        Gson gson = new Gson();
-        Voice voiceBean = gson.fromJson(resultString, Voice.class);
-        StringBuffer sb = new StringBuffer();
-        ArrayList<Voice.WSBean> ws = voiceBean.ws;
-        for (Voice.WSBean wsBean : ws) {
-            String word = wsBean.cw.get(0).w;
-            sb.append(word);
-        }
-        Toast.makeText(this, sb.toString(), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -392,17 +386,5 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
         }
         fTransaction.commit();
-    }
-
-    public class Voice {
-        public ArrayList<WSBean> ws;
-
-        public class WSBean {
-            public ArrayList<CWBean> cw;
-        }
-
-        public class CWBean {
-            public String w;
-        }
     }
 }
