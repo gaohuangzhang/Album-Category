@@ -1,7 +1,5 @@
 package hitcs.fghz.org.album;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,13 +9,13 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.tensorflow.demo.Classifier;
 import org.tensorflow.demo.TensorFlowImageClassifier;
@@ -40,7 +38,7 @@ import static hitcs.fghz.org.album.utils.ImagesScaner.getInformation;
  * Created by me on 16-12-31.
  */
 
-public class PhotoInfoActivity extends Activity {
+public class PhotoInfoActivity extends AppCompatActivity {
 
     // which image you are seeing
     private String url;
@@ -59,12 +57,8 @@ public class PhotoInfoActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // ui界面最上边的动作栏
-        ActionBar actionBar = getActionBar();
-        // 用于显示相应的属性
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle("相关信息");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
         // 生成布局
         setContentView(R.layout.photo_info);
         // get intent information

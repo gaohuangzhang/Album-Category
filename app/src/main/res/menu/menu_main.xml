@@ -1,23 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+
     <item
         android:id="@+id/action_search"
-        android:actionViewClass="android.widget.SearchView"
+        app:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/top_search"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="搜索"/>
     <item
         android:id="@+id/action_voice"
         android:icon="@drawable/voice"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="语音"/>
     <item
         android:id="@+id/action_camera"
         android:icon="@drawable/camera"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="相机"/>
 
 </menu>

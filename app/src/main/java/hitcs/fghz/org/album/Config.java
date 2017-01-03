@@ -1,5 +1,7 @@
 package hitcs.fghz.org.album;
 
+import android.os.Handler;
+
 import org.tensorflow.demo.TensorFlowImageClassifier;
 
 import hitcs.fghz.org.album.dao.MyDatabaseHelper;
@@ -30,7 +32,7 @@ public class Config {
     public static boolean workdone = false;
     // init the application done
     public static boolean init = false;
-    //
+
     public static int tf_type_times = 14;
     public static String[] tf_type_name = {"animal",
             "building", "car", "flower",

@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,7 +35,7 @@ import hitcs.fghz.org.album.view.MyHorizontalScrollView;
 import hitcs.fghz.org.album.view.MyHorizontalScrollView.*;
 import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
 
-public class PhotoDetailActivity extends Activity implements View.OnClickListener {
+public class PhotoDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     // 初始化几个textview， 可以点击并且出发事件
     private TextView txt_back;
@@ -66,12 +67,8 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fg_detail);
-        ActionBar actionBar = getActionBar();
-        // 用于显示相应的属性 actonbar
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(" 相簿");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
         // 绑定textview按钮
         bindViews();
         // get photo list

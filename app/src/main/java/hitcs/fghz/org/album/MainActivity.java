@@ -28,6 +28,8 @@ import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,7 +51,6 @@ import java.util.List;
 
 import hitcs.fghz.org.album.dao.MyDatabaseHelper;
 
-import static hitcs.fghz.org.album.utils.ImagesScaner.prepareForApplication;
 
 /**
  * 主活动
@@ -86,7 +87,7 @@ import static hitcs.fghz.org.album.utils.ImagesScaner.prepareForApplication;
  * mipmap：图标资源，如返回删除分享图标
  *
  */
-public class MainActivity extends Activity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     //UI Object
     private TextView txt_photos;
@@ -104,7 +105,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private File newFile;
 
     // actionBar
-    public static ActionBar actionBar;
+    public static android.support.v7.app.ActionBar actionBar;
     // fragment
     private FragmentTransaction fTransaction;
 
@@ -115,31 +116,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // ui界面最上边的动作栏
-        actionBar = getActionBar();
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setTitle(" 相簿");
+
         // 生成布局
         setContentView(R.layout.activity_main);
-        // 申请相机权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-        // init tensorflow
-        if (Config.classifier == null) {
-            Config.classifier = new TensorFlowImageClassifier();
-            try {
-                Config.classifier.initializeTensorFlow(
-                        getAssets(), Config.MODEL_FILE, Config.LABEL_FILE, Config.NUM_CLASSES, Config.INPUT_SIZE, Config.IMAGE_MEAN, Config.IMAGE_STD,
-                        Config.INPUT_NAME, Config.OUTPUT_NAME);
-            } catch (final IOException e) {
-                ;
-            }
-        }
-        prepareForApplication(this);
-
+        // ui界面最上边的动作栏
+        actionBar = getSupportActionBar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         // fragment
         fManager = getFragmentManager();
         // 绑定事件
@@ -362,11 +344,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
         hideAllFragment(fTransaction);
         switch (v.getId()){
             // 照片
+
             case R.id.all_photos:
                 // set ActionBar tile && set no click action
                 actionBar.setDisplayHomeAsUpEnabled(false);
-                actionBar.setTitle(" 相簿");
-
+                actionBar.setTitle("照片");
                 setSelected();
                 txt_photos.setSelected(true);
                 // 暂时使用弹出堆栈，以避免从相簿进入相册无法返回
@@ -384,8 +366,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
             case R.id.memory:
                 // 用于显示相应的属性
                 // same as photos
-                actionBar.setTitle(" 回忆");
                 actionBar.setDisplayHomeAsUpEnabled(false);
+                actionBar.setTitle("回忆");
+
                 setSelected();
                 txt_memory.setSelected(true);
                 getFragmentManager().popBackStack();
@@ -399,8 +382,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
             // 相册
             case R.id.all_albums:
                 // same as photos
-                actionBar.setTitle(" 相册");
                 actionBar.setDisplayHomeAsUpEnabled(false);
+                actionBar.setTitle("相册");
+
                 setSelected();
                 txt_albums.setSelected(true);
                 getFragmentManager().popBackStack();
