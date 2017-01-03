@@ -69,10 +69,6 @@ public class PhotoInfoActivity extends Activity {
         setContentView(R.layout.photo_info);
         // get intent information
         getMessage();
-        image_info = getInformation(PhotoInfoActivity.this, url);
-
-        TextView info2 = (TextView) findViewById(R.id.photo_info);
-        info2.setText("size: " + image_info.get("height") + "x" + image_info.get("width"));
         // try to init the tf
         initTensorflow();
         // deal image by tf

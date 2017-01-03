@@ -15,13 +15,6 @@
 
 
 
-    <TextView
-        android:text="图片信息"
-        android:layout_margin="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/photo_info" />
-
     <ListView
         android:id="@+id/photo_type_list"
         android:layout_width="match_parent"
@@ -36,18 +29,5 @@
 
     </ListView>
 
-    <ListView
-        android:id="@+id/photo_type_list1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="1dp"
-        android:columnWidth="100dp"
-        android:gravity="center"
-        android:horizontalSpacing="1dp"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="1dp" >
-
-    </ListView>
 
 </LinearLayout>

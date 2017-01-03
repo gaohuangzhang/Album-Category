@@ -54,7 +54,7 @@ public class Memory extends Fragment {
     private void initMemory() {
         MemoryItem memory;
         for (int i = 0; i != 20; ++i) {
-            memory = new MemoryItem(R.drawable.girl);
+            memory = new MemoryItem(R.drawable.flower);
             memoryList.add(memory);
         }
     }

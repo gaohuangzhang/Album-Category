@@ -12,6 +12,7 @@ import org.tensorflow.demo.Classifier;
 
 import java.util.List;
 
+import hitcs.fghz.org.album.Config;
 import hitcs.fghz.org.album.R;
 
 
@@ -31,7 +32,14 @@ public class PhotoTypeAdapter extends ArrayAdapter<Classifier.Recognition> {
         Classifier.Recognition type= getItem(position);
         View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
         ImageView memoryImage = (ImageView) view.findViewById(R.id.type_image);
-        memoryImage.setImageResource(R.drawable.a);
+        int i;
+        for (i = 0; i < Config.tf_type_times; ++i) {
+            if (Config.tf_type_name[i].equals(type.getTitle())) {
+                break;
+            }
+        }
+
+        memoryImage.setImageResource(Config.tf_type_image[i]);
         TextView tv = (TextView) view.findViewById(R.id.type_name);
         tv.setText("type: " + type.getTitle() + "\nconfidence: " + type.getConfidence());
         return view;
