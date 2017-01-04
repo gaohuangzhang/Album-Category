@@ -3,6 +3,7 @@ package hitcs.fghz.org.album;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,8 +43,9 @@ public class Memory extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                System.out.println(position+ " " +id);
-                Intent intent = new Intent(getActivity(), PhotoDetailActivity.class);
+                Log.d("Memeory", "" + position);
+                Intent intent = new Intent(getActivity(), MovieShowActivity.class);
+                intent.putExtra("type" ,memoryList.get(position).getType());
                 startActivity(intent);
             }
         });
@@ -55,7 +57,7 @@ public class Memory extends Fragment {
         result = getAlbumInfo(getContext());
 
         for (Map<String, String> s: result) {
-            memory = new MemoryItem(s.get("show_image"));
+            memory = new MemoryItem(s.get("show_image"), s.get("album_name"));
             memoryList.add(memory);
         }
     }

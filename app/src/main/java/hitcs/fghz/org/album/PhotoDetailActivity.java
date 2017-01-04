@@ -22,6 +22,7 @@ import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
 import hitcs.fghz.org.album.view.MyHorizontalScrollView;
 import hitcs.fghz.org.album.view.MyHorizontalScrollView.CurrentImageChangeListener;
 import hitcs.fghz.org.album.view.MyHorizontalScrollView.OnItemClickListener;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumPhotos;
 import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
@@ -79,6 +80,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
         else
             mDatas = getMediaImageInfo(this.getBaseContext());
         mImg = (ImageView) findViewById(R.id.id_content);
+        PhotoViewAttacher mAttacher = new PhotoViewAttacher(mImg);
         mHorizontalScrollView = (MyHorizontalScrollView) findViewById(R.id.id_horizontalScrollView);
         mAdapter = new HorizontalScrollViewAdapter(this, mDatas);
         //添加滚动回调

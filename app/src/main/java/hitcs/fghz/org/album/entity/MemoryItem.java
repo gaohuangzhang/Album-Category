@@ -7,10 +7,13 @@ package hitcs.fghz.org.album.entity;
 
 public class MemoryItem {
     private String imageId;
-    public MemoryItem(String imageId) {
+    private String type;
+    public MemoryItem(String imageId, String type) {
         this.imageId = imageId;
+        this.type = type;
     }
     public String getImageId() {
         return imageId;
     }
+    public String getType() { return type; }
 }

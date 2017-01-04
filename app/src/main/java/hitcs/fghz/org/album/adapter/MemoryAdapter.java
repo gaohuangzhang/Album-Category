@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -61,6 +62,9 @@ public class MemoryAdapter extends ArrayAdapter<MemoryItem> {
                 holder = new AlbumAdapter.ViewHolder();
                 holder.iv_thumbnail = (ImageView) convertView.findViewById(R.id.memory_photo);
                 holder.thumbnail_url = memory.getImageId();
+                holder.albumName = (TextView) convertView.findViewById(R.id.memory_title);
+
+
 //                holder.albumName = (TextView) convertView.findViewById(R.id.album_name);
 //                holder.albumName.setText(album.getName());
                 convertView.setTag(holder);
@@ -96,6 +100,7 @@ public class MemoryAdapter extends ArrayAdapter<MemoryItem> {
                     }
                 }
                 holder.iv_thumbnail.setImageBitmap(bmp[0]);
+                holder.albumName.setText(memory.getType());
 
             }
 
@@ -108,7 +113,7 @@ public class MemoryAdapter extends ArrayAdapter<MemoryItem> {
     static class ViewHolder {
         ImageView iv_thumbnail;
         String thumbnail_url;
-//        TextView albumName;
+        TextView albumName;
     }
     private void loadThumBitmap(final String url) {
         Bitmap bitmap = getBitmap(getContext(),url);

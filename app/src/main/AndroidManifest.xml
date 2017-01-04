@@ -44,6 +44,9 @@
 
         </activity>
         <activity android:name=".PhotoInfoActivity"></activity>
+        <activity android:name=".MovieShowActivity">
+            android:screenOrientation="portrait"
+        </activity>
 
     </application>
 
