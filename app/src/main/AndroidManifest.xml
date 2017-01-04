@@ -20,7 +20,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light">
+
+        android:theme="@style/Theme.AppCompat.Light"
+        android:hardwareAccelerated="true">
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="hitcs.fghz.org.album.fileprovider"
@@ -42,9 +45,15 @@
         </activity>
         <activity android:name=".PhotoDetailActivity">
         </activity>
-        <activity android:name=".PhotoInfoActivity"/>
+
         <activity android:name=".VoiceFoundActivity">
         </activity>
+
+        <activity android:name=".PhotoInfoActivity"></activity>
+        <activity android:name=".MovieShowActivity">
+            android:screenOrientation="portrait"
+        </activity>
+
     </application>
 
 </manifest>

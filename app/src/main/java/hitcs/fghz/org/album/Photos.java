@@ -58,8 +58,16 @@ public class Photos extends Fragment {
 
         View view = inflater.inflate(R.layout.fg_photos,container,false);
         gridView = (GridView) view.findViewById(R.id.gridView1);
-        if (type != null)
+        if (type != null) {
             this.result = getAlbumPhotos(getContext(), this.type);
+            try {
+                android.support.v7.app.ActionBar actionBar = MainActivity.actionBar;
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setTitle(type);
+            } catch (Exception e) {
+                ;
+            }
+        }
         // 获得照片数据
         initPhoto();
         // 获得gridview

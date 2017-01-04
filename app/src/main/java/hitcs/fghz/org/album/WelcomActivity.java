@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,16 +16,20 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import org.tensorflow.demo.Classifier;
 import org.tensorflow.demo.TensorFlowImageClassifier;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import hitcs.fghz.org.album.dao.MyDatabaseHelper;
 import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
 
@@ -36,6 +41,12 @@ import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
  */
 
 public class WelcomActivity extends AppCompatActivity {
+
+    private static final int PERMISSION_REQUEST_STORAGE = 200;
+    private static final int PERMISSION_REQUEST_CAMERA = 201;
+
+    private static final int ACTIVITY_REQUEST_CAMERA = 200;
+
 
     private TextView textView = null;
     private int i = 0;
@@ -49,8 +60,23 @@ public class WelcomActivity extends AppCompatActivity {
             switch (msg.what)
             {
                 case 0x24:
-                    startActivity(new Intent(getApplication(),  MainActivity.class));
-                    WelcomActivity.this.finish();
+                    ProgressBar p = (ProgressBar) findViewById(R.id.progressBar);
+                    p.setVisibility(p.GONE);
+                    textView.setText("Great Album");
+                    textView.setTextSize(32);
+                    textView.setTextColor(Color.rgb(140, 21, 119));
+                    final Intent it = new Intent(getApplication(), MainActivity.class); //你要转向的Activity
+                    Timer timer = new Timer();
+                    TimerTask task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            startActivity(it); //执行
+                            WelcomActivity.this.finish();
+                        }
+                    };
+                    timer.schedule(task, 1000 * 2); //10秒后
+                    break;
+
                 case 0x123:
                     i++;
                     if (textView != null)
@@ -63,12 +89,7 @@ public class WelcomActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,  Manifest.permission.READ_EXTERNAL_STORAGE}, 4);
-        } catch (Exception e) {
-            Log.d("didn't", "perssion");
-        }
+
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -95,6 +116,7 @@ public class WelcomActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Looper.prepare();
+
                 prepareForApplication(WelcomActivity.this);
                 Looper.loop();
             }
@@ -105,6 +127,10 @@ public class WelcomActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public  void prepareForApplication(Context ctx) {
+        if (Build.VERSION.SDK_INT >= 23) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+        }
         Config.dbHelper = new MyDatabaseHelper(ctx, "Album.db", null, Config.dbversion);
         SQLiteDatabase db = Config.dbHelper.getWritableDatabase();
         List<Map> tmp = getMediaImageInfo(ctx);
@@ -125,31 +151,38 @@ public class WelcomActivity extends AppCompatActivity {
             if (!cursor.moveToFirst()) {
                 Log.d("Detail of photo", "not in album");
                 ContentValues values = new ContentValues();
-                values.put("url", url);
+                ContentValues values_ablum = null;
+
 
                 if (Config.classifier != null) {
                     // get bitmap
                     bitmap = BitmapFactory.decodeFile(url, options);
                     do_tensorflow(bitmap);
 
-                    values.put("album_name", results.get(0).getTitle());
-                    Log.d("ADD INTO ALBUM", url + "  " + results.get(0).getTitle());
-                    cursor_album = db.query("Album", null, "album_name ='" +  results.get(0).getTitle() + "'", null, null, null, null);
-                    if (!cursor_album.moveToFirst()) {
-                        ContentValues values_ablum = new ContentValues();
-                        values_ablum.put("album_name", results.get(0).getTitle());
-                        values_ablum.put("show_image", url);
-                        db.insert("Album", null, values_ablum);
-                    } else {
-                        String album = cursor_album.getString(cursor_album.getColumnIndex("album_name"));
-                        String url_album = cursor_album.getString(cursor_album.getColumnIndex("show_image"));
+                    for (Classifier.Recognition cr : results) {
+                        values.put("url", url);
 
-                        Log.d("ALBUM have album", album + " " + url_album);
+                        values.put("album_name",cr.getTitle());
+                        Log.d("ADD INTO ALBUM", url + "  " + cr.getTitle());
+                        cursor_album = db.query("Album", null, "album_name ='" + cr.getTitle() + "'", null, null, null, null);
+                        if (!cursor_album.moveToFirst()) {
+                            values_ablum = new ContentValues();
+                            values_ablum.put("album_name", cr.getTitle());
+                            values_ablum.put("show_image", url);
+                            db.insert("Album", null, values_ablum);
+                            values_ablum.clear();
+                        } else {
+                            String album = cursor_album.getString(cursor_album.getColumnIndex("album_name"));
+                            String url_album = cursor_album.getString(cursor_album.getColumnIndex("show_image"));
+
+                            Log.d("ALBUM have album", album + " " + url_album);
+                        }
+                        cursor_album.close();
+                        db.insert("AlbumPhotos", null, values);
+                        values.clear();
                     }
-                    cursor_album.close();
                 }
-                db.insert("AlbumPhotos", null, values);
-                values.clear();
+
             }
             else {
                 String name = cursor.getString(cursor.getColumnIndex("album_name"));

@@ -1,6 +1,5 @@
 package hitcs.fghz.org.album;
 
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
+import hitcs.fghz.org.album.view.MyHorizontalScrollView;
+import hitcs.fghz.org.album.view.MyHorizontalScrollView.CurrentImageChangeListener;
+import hitcs.fghz.org.album.view.MyHorizontalScrollView.OnItemClickListener;
+import uk.co.senab.photoview.PhotoViewAttacher;
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumPhotos;
+import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
 
 /**
  * 查看照片细节的activity
@@ -24,13 +29,8 @@ import android.widget.TextView;
  * Created by me on 16-12-20.
  */
 // tf
-import org.tensorflow.demo.TensorFlowImageClassifier;
 // some method may be used about db or others
-import static hitcs.fghz.org.album.utils.ImagesScaner.*;
 // adapter && view
-import hitcs.fghz.org.album.view.MyHorizontalScrollView;
-import hitcs.fghz.org.album.view.MyHorizontalScrollView.*;
-import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
 
 public class PhotoDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -76,6 +76,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
         else
             mDatas = getMediaImageInfo(this.getBaseContext());
         mImg = (ImageView) findViewById(R.id.id_content);
+        PhotoViewAttacher mAttacher = new PhotoViewAttacher(mImg);
         mHorizontalScrollView = (MyHorizontalScrollView) findViewById(R.id.id_horizontalScrollView);
         mAdapter = new HorizontalScrollViewAdapter(this, mDatas);
         //添加滚动回调
@@ -91,7 +92,11 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
                             init = true;
                         }
                         Log.d("PhotoDetail: ", "Image change to: " + position);
-                        mImg.setImageURI(Uri.fromFile(new File((String)mDatas.get(position).get("_data"))));
+                        try {
+                            mImg.setImageURI(Uri.fromFile(new File((String) mDatas.get(position).get("_data"))));
+                        } catch (Exception e) {
+                            ;
+                        }
 
                         viewIndicator.setBackgroundColor(Color.parseColor("#AA024DA4"));
                     }

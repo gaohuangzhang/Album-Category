@@ -16,7 +16,7 @@
             android:layout_height="fill_parent"
             android:layout_gravity="center"
             android:layout_margin="0dp"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
              />
     </FrameLayout>
 

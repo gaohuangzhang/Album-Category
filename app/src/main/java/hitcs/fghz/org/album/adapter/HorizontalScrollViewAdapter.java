@@ -5,22 +5,22 @@ package hitcs.fghz.org.album.adapter;
  * Created by me on 16-12-21.
  */
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
+import java.util.List;
+import java.util.Map;
+
+import hitcs.fghz.org.album.Config;
 import hitcs.fghz.org.album.R;
 
 import static android.media.ThumbnailUtils.extractThumbnail;
@@ -39,6 +39,16 @@ public class HorizontalScrollViewAdapter extends BaseAdapter
         this.mContext = context;
         mInflater = LayoutInflater.from(context);
         this.mDatas = mDatas;
+        if (Config.mImageCache == null) {
+            final int memClass = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+            final int maxSize = 1024 * 1024 * memClass / 8;
+            Config.mImageCache = new LruCache(maxSize) {
+                protected int sizeOf(String key, Bitmap value) {
+                    // TODO 自动生成的方法存根
+                    return value.getByteCount();
+                }
+            };
+        }
     }
 
     @Override
@@ -74,36 +84,47 @@ public class HorizontalScrollViewAdapter extends BaseAdapter
 
 
             convertView.setTag(viewHolder);
-        } else
-        {
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         try {
             url = (String) mDatas.get(position).get("_data");
-            Bitmap bitmap = getBitmap(this.mContext,url);
+            Bitmap bitmap = (Bitmap) Config.mImageCache.get(url);
+
             if (bitmap != null) {
                 ;
             } else {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_4444;
-                bitmap = BitmapFactory.decodeFile(url, options);
-                bitmap = extractThumbnail(bitmap, 100, 100);
+                loadThumBitmap(url);
+                bitmap = (Bitmap) Config.mImageCache.get(url);
             }
 
             viewHolder.mImg.setImageBitmap(bitmap);
         } catch (Exception e) {
             viewHolder.mImg.setImageResource(R.drawable.none);
         }
-
-
-
         return convertView;
     }
 
     private class ViewHolder
     {
         ImageView mImg;
-        TextView mText;
+    }
+    private void loadThumBitmap(final String url) {
+        Bitmap bitmap = getBitmap(mContext,url);
+        if (bitmap != null) {
+            ;
+        } else {
+            try {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+                bitmap = BitmapFactory.decodeFile(url, options);
+                bitmap = extractThumbnail(bitmap,180 , 180);
+            } catch (Exception e) {
+                Log.d("Error: " , " " + e);
+            }
+        }
+        Config.mImageCache.put(url, bitmap);
+        notifyDataSetChanged();
     }
 
 }

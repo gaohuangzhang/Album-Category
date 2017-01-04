@@ -3,6 +3,7 @@ package hitcs.fghz.org.album;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,23 +12,22 @@ import android.widget.GridView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import hitcs.fghz.org.album.entity.MemoryItem;
 import hitcs.fghz.org.album.adapter.MemoryAdapter;
+import hitcs.fghz.org.album.entity.MemoryItem;
+
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumInfo;
 
 /**
  * 回忆 栏的fregment的具体定义
  */
 
 public class Memory extends Fragment {
-    // 同photos.java
-
-    private String content;
+    private List<Map<String, String>> result;
     public Memory() {
 
     }
-    private String[] data = { "Apple", "Banana", "Orange", "Watermelon",
-            "Pear", "Grape", "Pineapple", "Strawberry", "Cherry", "Mango" };
     private List<MemoryItem> memoryList = new ArrayList<MemoryItem>();
 
     @Override
@@ -43,8 +43,9 @@ public class Memory extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                System.out.println(position+ " " +id);
-                Intent intent = new Intent(getActivity(), PhotoDetailActivity.class);
+                Log.d("Memeory", "" + position);
+                Intent intent = new Intent(getActivity(), MovieShowActivity.class);
+                intent.putExtra("type" ,memoryList.get(position).getType());
                 startActivity(intent);
             }
         });
@@ -53,8 +54,10 @@ public class Memory extends Fragment {
     }
     private void initMemory() {
         MemoryItem memory;
-        for (int i = 0; i != 20; ++i) {
-            memory = new MemoryItem(R.drawable.flower);
+        result = getAlbumInfo(getContext());
+
+        for (Map<String, String> s: result) {
+            memory = new MemoryItem(s.get("show_image"), s.get("album_name"));
             memoryList.add(memory);
         }
     }

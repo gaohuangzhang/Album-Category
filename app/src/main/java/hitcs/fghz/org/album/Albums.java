@@ -87,8 +87,6 @@ public class Albums extends Fragment {
              album = new AlbumItem(s.get("album_name"), s.get("show_image"));
             albumList.add(album);
         }
-//        album = new AlbumItem("Add", R.drawable.add);
-//        albumList.add(album);
 
     }
 }

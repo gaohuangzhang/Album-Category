@@ -1,5 +1,6 @@
 package hitcs.fghz.org.album;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -22,6 +23,7 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -97,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Photos photos;
     private Albums albums;
     private FragmentManager fManager;
+    private static final int PERMISSION_REQUEST_STORAGE = 200;
 
     // for camera to save image
     private Uri contentUri;
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bindViews();
         //模拟一次点击，既进去后选择第一项
         txt_photos.performClick();
+
     }
     /**
      * ActionBar
@@ -160,6 +164,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.action_camera:
                 // 拍照
+                if (Build.VERSION.SDK_INT >= 23) {
+                    ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.CAMERA},
+                            PERMISSION_REQUEST_STORAGE);
+                }
                 startCamera();
                 break;
                 // 语音
