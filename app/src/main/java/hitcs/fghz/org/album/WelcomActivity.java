@@ -1,8 +1,6 @@
 package hitcs.fghz.org.album;
 
 import android.Manifest;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -133,31 +131,38 @@ public class WelcomActivity extends AppCompatActivity {
             if (!cursor.moveToFirst()) {
                 Log.d("Detail of photo", "not in album");
                 ContentValues values = new ContentValues();
-                values.put("url", url);
+                ContentValues values_ablum = null;
+
 
                 if (Config.classifier != null) {
                     // get bitmap
                     bitmap = BitmapFactory.decodeFile(url, options);
                     do_tensorflow(bitmap);
 
-                    values.put("album_name", results.get(0).getTitle());
-                    Log.d("ADD INTO ALBUM", url + "  " + results.get(0).getTitle());
-                    cursor_album = db.query("Album", null, "album_name ='" +  results.get(0).getTitle() + "'", null, null, null, null);
-                    if (!cursor_album.moveToFirst()) {
-                        ContentValues values_ablum = new ContentValues();
-                        values_ablum.put("album_name", results.get(0).getTitle());
-                        values_ablum.put("show_image", url);
-                        db.insert("Album", null, values_ablum);
-                    } else {
-                        String album = cursor_album.getString(cursor_album.getColumnIndex("album_name"));
-                        String url_album = cursor_album.getString(cursor_album.getColumnIndex("show_image"));
+                    for (Classifier.Recognition cr : results) {
+                        values.put("url", url);
 
-                        Log.d("ALBUM have album", album + " " + url_album);
+                        values.put("album_name",cr.getTitle());
+                        Log.d("ADD INTO ALBUM", url + "  " + cr.getTitle());
+                        cursor_album = db.query("Album", null, "album_name ='" + cr.getTitle() + "'", null, null, null, null);
+                        if (!cursor_album.moveToFirst()) {
+                            values_ablum = new ContentValues();
+                            values_ablum.put("album_name", cr.getTitle());
+                            values_ablum.put("show_image", url);
+                            db.insert("Album", null, values_ablum);
+                            values_ablum.clear();
+                        } else {
+                            String album = cursor_album.getString(cursor_album.getColumnIndex("album_name"));
+                            String url_album = cursor_album.getString(cursor_album.getColumnIndex("show_image"));
+
+                            Log.d("ALBUM have album", album + " " + url_album);
+                        }
+                        cursor_album.close();
+                        db.insert("AlbumPhotos", null, values);
+                        values.clear();
                     }
-                    cursor_album.close();
                 }
-                db.insert("AlbumPhotos", null, values);
-                values.clear();
+
             }
             else {
                 String name = cursor.getString(cursor.getColumnIndex("album_name"));

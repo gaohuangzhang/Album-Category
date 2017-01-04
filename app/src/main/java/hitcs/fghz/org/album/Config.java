@@ -1,6 +1,6 @@
 package hitcs.fghz.org.album;
 
-import android.os.Handler;
+import android.support.v4.util.LruCache;
 
 import org.tensorflow.demo.TensorFlowImageClassifier;
 
@@ -32,6 +32,8 @@ public class Config {
     public static boolean workdone = false;
     // init the application done
     public static boolean init = false;
+    // image cache
+    public static LruCache mImageCache;
 
     public static int tf_type_times = 14;
     public static String[] tf_type_name = {"动物",

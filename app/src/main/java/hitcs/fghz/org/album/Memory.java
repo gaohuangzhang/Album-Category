@@ -13,9 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import hitcs.fghz.org.album.entity.AlbumItem;
-import hitcs.fghz.org.album.entity.MemoryItem;
 import hitcs.fghz.org.album.adapter.MemoryAdapter;
+import hitcs.fghz.org.album.entity.MemoryItem;
 
 import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumInfo;
 
@@ -24,14 +23,10 @@ import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumInfo;
  */
 
 public class Memory extends Fragment {
-    // 同photos.java
-
     private List<Map<String, String>> result;
     public Memory() {
 
     }
-    private String[] data = { "Apple", "Banana", "Orange", "Watermelon",
-            "Pear", "Grape", "Pineapple", "Strawberry", "Cherry", "Mango" };
     private List<MemoryItem> memoryList = new ArrayList<MemoryItem>();
 
     @Override
@@ -58,13 +53,9 @@ public class Memory extends Fragment {
     private void initMemory() {
         MemoryItem memory;
         result = getAlbumInfo(getContext());
-//        for (int i = 0; i != 20; ++i) {
-//            memory = new MemoryItem(R.drawable.flower);
-//            memoryList.add(memory);
-//        }
+
         for (Map<String, String> s: result) {
             memory = new MemoryItem(s.get("show_image"));
-//            album = new AlbumItem(s.get("album_name"), s.get("show_image"));
             memoryList.add(memory);
         }
     }

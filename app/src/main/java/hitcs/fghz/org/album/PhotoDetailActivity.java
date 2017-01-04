@@ -1,12 +1,6 @@
 package hitcs.fghz.org.album;
 
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -20,6 +14,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+
+import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
+import hitcs.fghz.org.album.view.MyHorizontalScrollView;
+import hitcs.fghz.org.album.view.MyHorizontalScrollView.CurrentImageChangeListener;
+import hitcs.fghz.org.album.view.MyHorizontalScrollView.OnItemClickListener;
+
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumPhotos;
+import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
 
 /**
  * 查看照片细节的activity
@@ -27,13 +32,8 @@ import android.widget.TextView;
  * Created by me on 16-12-20.
  */
 // tf
-import org.tensorflow.demo.TensorFlowImageClassifier;
 // some method may be used about db or others
-import static hitcs.fghz.org.album.utils.ImagesScaner.*;
 // adapter && view
-import hitcs.fghz.org.album.view.MyHorizontalScrollView;
-import hitcs.fghz.org.album.view.MyHorizontalScrollView.*;
-import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
 
 public class PhotoDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -94,7 +94,11 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
                             init = true;
                         }
                         Log.d("PhotoDetail: ", "Image change to: " + position);
-                        mImg.setImageURI(Uri.fromFile(new File((String)mDatas.get(position).get("_data"))));
+                        try {
+                            mImg.setImageURI(Uri.fromFile(new File((String) mDatas.get(position).get("_data"))));
+                        } catch (Exception e) {
+                            ;
+                        }
 
                         viewIndicator.setBackgroundColor(Color.parseColor("#AA024DA4"));
                     }

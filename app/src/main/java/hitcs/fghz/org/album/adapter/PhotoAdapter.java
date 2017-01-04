@@ -1,11 +1,12 @@
 package hitcs.fghz.org.album.adapter;
 
-import java.util.List;
-
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import java.util.List;
 
+import hitcs.fghz.org.album.Config;
 import hitcs.fghz.org.album.R;
 import hitcs.fghz.org.album.entity.PhotoItem;
 
@@ -27,26 +30,46 @@ import static hitcs.fghz.org.album.utils.ImagesScaner.getBitmap;
  */
 public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
     private int resourceId;
-    LruCache mImageCache;
     LayoutInflater mInflater;
     List<PhotoItem> mImageList;
     boolean mBusy = false;
+    private Handler myHandler = new Handler()
+    {
+        @Override
+        //重写handleMessage方法,根据msg中what的值判断是否执行后续操作
+        public void handleMessage(Message msg) {
+            switch (msg.what)
+            {
+                case 0x24:
+                    Log.d("change", "y");
+                    notifyDataSetChanged();
+
+                    break;
+
+                case 0x123:
+
+                    break;
+            }
+        }
+    };
+
     public void setMImageList(List<PhotoItem> mImageList) {
         this.mImageList = mImageList;
     }
-
     public PhotoAdapter(Context context, int textViewResourceId,
                         List<PhotoItem> objects) {
         super(context, textViewResourceId, objects);
         mInflater = LayoutInflater.from(context);
-        final int memClass = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
-        final int maxSize = 1024 * 1024 * memClass / 8;
-        mImageCache = new LruCache(maxSize) {
-            protected int sizeOf(String key, Bitmap value) {
-                // TODO 自动生成的方法存根
-                return value.getByteCount();
-            }
-        };
+        if (Config.mImageCache == null) {
+            final int memClass = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+            final int maxSize = 1024 * 1024 * memClass / 8;
+            Config.mImageCache = new LruCache(maxSize) {
+                protected int sizeOf(String key, Bitmap value) {
+                    // TODO 自动生成的方法存根
+                    return value.getByteCount();
+                }
+            };
+        }
         mImageList = objects;
         resourceId = textViewResourceId;
     }
@@ -89,24 +112,30 @@ public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
             }
             if (!isBusy()) {
                 final String imgUrl = photo.getImageId();
-                Bitmap bmp = (Bitmap) mImageCache.get(imgUrl);
-                if (bmp != null) {
-                    holder.iv_thumbnail.setImageBitmap(bmp);
-
+                final Bitmap[] bmp = {(Bitmap) Config.mImageCache.get(imgUrl)};
+                if (bmp[0] != null) {
+                    ;
                 } else {
                     try {
 //                    holder.iv_thumbnail.setImageResource(R.drawable.b);
-                        setBusy(true);
 
-                        loadThumBitmap(imgUrl, photo);
-                        bmp = (Bitmap) mImageCache.get(imgUrl);
-                        holder.iv_thumbnail.setImageBitmap(bmp);
+                        setBusy(true);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Looper.prepare();
+                        loadThumBitmap(imgUrl);
+                        bmp[0] = (Bitmap) Config.mImageCache.get(imgUrl);
+                                Looper.loop();
+                            }
+                        }).start();
                         setBusy(false);
 
                     } catch (Exception e) {
                         Log.d("Error:", "" + e);
                     }
                 }
+                holder.iv_thumbnail.setImageBitmap(bmp[0]);
 
             }
 
@@ -115,22 +144,22 @@ public class PhotoAdapter extends ArrayAdapter<PhotoItem> {
         }
         return convertView;
     }
-    private void loadThumBitmap(final String url, PhotoItem photo) {
-        Bitmap bitmap = getBitmap(getContext(),photo.getImageId());
+    private void loadThumBitmap(final String url) {
+        Bitmap bitmap = getBitmap(getContext(),url);
         if (bitmap != null) {
             ;
         } else {
             try {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inPreferredConfig = Bitmap.Config.ARGB_4444;
-                bitmap = BitmapFactory.decodeFile(photo.getImageId(), options);
+                bitmap = BitmapFactory.decodeFile(url, options);
                 bitmap = extractThumbnail(bitmap,180 , 180);
             } catch (Exception e) {
                 Log.d("Error: " , " " + e);
             }
         }
-        mImageCache.put(url, bitmap);
-        notifyDataSetChanged();
+        Config.mImageCache.put(url, bitmap);
+        myHandler.sendEmptyMessage(0x24);
     }
     @Override
     public int getItemViewType(int position) {
