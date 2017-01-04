@@ -64,7 +64,7 @@ public class AlbumAdapter extends ArrayAdapter<AlbumItem> {
                 holder.iv_thumbnail = (ImageView) convertView.findViewById(R.id.album_image);
                 holder.thumbnail_url = album.getImageId();
                 holder.albumName = (TextView) convertView.findViewById(R.id.album_name);
-                holder.albumName.setText(album.getName());
+
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -98,6 +98,7 @@ public class AlbumAdapter extends ArrayAdapter<AlbumItem> {
                     }
                 }
                 holder.iv_thumbnail.setImageBitmap(bmp[0]);
+                holder.albumName.setText(album.getName());
 
             }
 
