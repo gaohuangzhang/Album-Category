@@ -34,16 +34,16 @@ public class Config {
     public static boolean init = false;
 
     public static int tf_type_times = 14;
-    public static String[] tf_type_name = {"animal",
-            "building", "car", "flower",
-            "group photo", "manga", "people",
-            "room", "scenery", "snow", "text",
-            "things", "classroom", "work space"
+    public static String[] tf_type_name = {"动物",
+            "建筑", "车辆", "花朵",
+            "很多人", "二次元", "人物",
+            "风景", "雪景", "含有文字",
+            "物品", "教室", "工作地点"
     };
     public static int[] tf_type_image = {R.drawable.animal,
             R.drawable.building, R.drawable.car,R.drawable.flower,
             R.drawable.group_people, R.drawable.manga, R.drawable.people,
-            R.drawable.room,R.drawable.scenery, R.drawable.snow,R.drawable.text,
+            R.drawable.scenery, R.drawable.snow,R.drawable.text,
             R.drawable.things,R.drawable.room,R.drawable.room, R.drawable.a
     };
 }

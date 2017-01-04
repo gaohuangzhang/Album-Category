@@ -1,6 +1,9 @@
 package hitcs.fghz.org.album.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,9 @@ import java.util.List;
 
 import hitcs.fghz.org.album.R;
 import hitcs.fghz.org.album.entity.MemoryItem;
+
+import static android.media.ThumbnailUtils.extractThumbnail;
+import static hitcs.fghz.org.album.utils.ImagesScaner.getBitmap;
 
 /**
  * 回忆栏目的适配器
@@ -29,7 +35,21 @@ public class MemoryAdapter extends ArrayAdapter<MemoryItem> {
         MemoryItem photo= getItem(position);
         View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
         ImageView memoryImage = (ImageView) view.findViewById(R.id.memory_photo);
-        memoryImage.setImageResource(photo.getImageId());
+
+        Bitmap bitmap = getBitmap(getContext(),photo.getImageId());
+        if (bitmap != null) {
+            ;
+        } else {
+            try {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+                bitmap = BitmapFactory.decodeFile(photo.getImageId(), options);
+                bitmap = extractThumbnail(bitmap,180 , 180);
+            } catch (Exception e) {
+                Log.d("Error: " , " " + e);
+            }
+        }
+        memoryImage.setImageBitmap(bitmap);
         return view;
     }
 }

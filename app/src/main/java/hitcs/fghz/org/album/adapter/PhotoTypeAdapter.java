@@ -41,7 +41,7 @@ public class PhotoTypeAdapter extends ArrayAdapter<Classifier.Recognition> {
 
         memoryImage.setImageResource(Config.tf_type_image[i]);
         TextView tv = (TextView) view.findViewById(R.id.type_name);
-        tv.setText("type: " + type.getTitle() + "\nconfidence: " + type.getConfidence());
+        tv.setText("图片类别: " + type.getTitle() + "\n自信程度: " + type.getConfidence());
         return view;
     }
 }

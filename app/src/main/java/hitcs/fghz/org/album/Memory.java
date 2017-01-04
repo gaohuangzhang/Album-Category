@@ -11,9 +11,13 @@ import android.widget.GridView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import hitcs.fghz.org.album.entity.AlbumItem;
 import hitcs.fghz.org.album.entity.MemoryItem;
 import hitcs.fghz.org.album.adapter.MemoryAdapter;
+
+import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumInfo;
 
 /**
  * 回忆 栏的fregment的具体定义
@@ -22,7 +26,7 @@ import hitcs.fghz.org.album.adapter.MemoryAdapter;
 public class Memory extends Fragment {
     // 同photos.java
 
-    private String content;
+    private List<Map<String, String>> result;
     public Memory() {
 
     }
@@ -53,8 +57,14 @@ public class Memory extends Fragment {
     }
     private void initMemory() {
         MemoryItem memory;
-        for (int i = 0; i != 20; ++i) {
-            memory = new MemoryItem(R.drawable.flower);
+        result = getAlbumInfo(getContext());
+//        for (int i = 0; i != 20; ++i) {
+//            memory = new MemoryItem(R.drawable.flower);
+//            memoryList.add(memory);
+//        }
+        for (Map<String, String> s: result) {
+            memory = new MemoryItem(s.get("show_image"));
+//            album = new AlbumItem(s.get("album_name"), s.get("show_image"));
             memoryList.add(memory);
         }
     }

@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
 public class SquareLayout extends RelativeLayout {
+    private int size = 1;
     public SquareLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
@@ -19,6 +20,10 @@ public class SquareLayout extends RelativeLayout {
 
     public SquareLayout(Context context) {
         super(context);
+    }
+    public SquareLayout(Context context, int size) {
+        super(context);
+        this.size = size;
     }
 
     @SuppressWarnings("unused")
@@ -36,6 +41,6 @@ public class SquareLayout extends RelativeLayout {
         int childHeightSize = getMeasuredHeight();
 //        <span style="color: rgb(153, 153, 153); font-family: Monaco, MonacoRegular, 'Courier New', monospace;  line-height: 15px; white-space: pre; background-color: rgb(248, 248, 255);"><em>//高度和宽度一样</em></span>
         heightMeasureSpec = widthMeasureSpec = MeasureSpec.makeMeasureSpec(childWidthSize, MeasureSpec.EXACTLY);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec / size);
     }
 }

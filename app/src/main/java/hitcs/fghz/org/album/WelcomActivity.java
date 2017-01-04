@@ -57,6 +57,8 @@ public class WelcomActivity extends AppCompatActivity {
                 case 0x24:
                     startActivity(new Intent(getApplication(),  MainActivity.class));
                     WelcomActivity.this.finish();
+                    break;
+
                 case 0x123:
                     i++;
                     if (textView != null)

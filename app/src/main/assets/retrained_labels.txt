@@ -1,13 +1,13 @@
-scenery
-classroom
-flower
-group photo
-people
-car
-work space
-snow
-things
-animal
-text
-building
-manga
+风景
+教室
+花朵
+很多人
+人物
+车辆
+工作地点
+雪景
+物品
+动物
+含有文字
+建筑
+二次元

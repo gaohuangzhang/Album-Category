@@ -6,11 +6,11 @@ package hitcs.fghz.org.album.entity;
  */
 
 public class MemoryItem {
-    private int imageId;
-    public MemoryItem(int imageId) {
+    private String imageId;
+    public MemoryItem(String imageId) {
         this.imageId = imageId;
     }
-    public int getImageId() {
+    public String getImageId() {
         return imageId;
     }
 }
