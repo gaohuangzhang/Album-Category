@@ -2,18 +2,13 @@ package hitcs.fghz.org.album;
 
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,15 +23,16 @@ import android.widget.TextView;
  * 点击照片后进入这个界面查看照片细节
  * Created by me on 16-12-20.
  */
+// tf
 import org.tensorflow.demo.TensorFlowImageClassifier;
-
+// some method may be used about db or others
 import static hitcs.fghz.org.album.utils.ImagesScaner.*;
-import hitcs.fghz.org.album.entity.PhotoItem;
+// adapter && view
 import hitcs.fghz.org.album.view.MyHorizontalScrollView;
 import hitcs.fghz.org.album.view.MyHorizontalScrollView.*;
 import hitcs.fghz.org.album.adapter.HorizontalScrollViewAdapter;
 
-public class PhotoDetailActivity extends Activity implements View.OnClickListener {
+public class PhotoDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     // 初始化几个textview， 可以点击并且出发事件
     private TextView txt_back;
@@ -50,44 +46,36 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
     private HorizontalScrollViewAdapter mAdapter;
     private ImageView mImg;
     // 照片数组。照片在drawable文件夹中，名字为a.png ...
-    private List<Map> mDatas ;
-
+    private List<Map> mDatas;
+    // which image
     int position_now = -1;
+    // image url
     String url = null;
-
+    // has been init
     boolean init = false;
+    private String type = null;
 
-    TensorFlowImageClassifier classifier;
     PhotoDetailActivity() {
-        this.classifier = null;
-    }
 
-    PhotoDetailActivity(TensorFlowImageClassifier classifier) {
-        this.classifier = classifier;
     }
 
     // 重写创建活动的方法
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.fg_detail);
-
-        ActionBar actionBar = getActionBar();
-        // 用于显示相应的属性
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
         // 绑定textview按钮
         bindViews();
-
+        // get photo list
         initPhoto();
-
-
+        if (type != null)
+            mDatas = getAlbumPhotos(this, this.type);
         // 下面设置下面缩略图上面大图。
-        mDatas = getMediaImageInfo(this.getBaseContext());
+        else
+            mDatas = getMediaImageInfo(this.getBaseContext());
         mImg = (ImageView) findViewById(R.id.id_content);
-
         mHorizontalScrollView = (MyHorizontalScrollView) findViewById(R.id.id_horizontalScrollView);
         mAdapter = new HorizontalScrollViewAdapter(this, mDatas);
         //添加滚动回调
@@ -104,8 +92,8 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
                         }
                         Log.d("PhotoDetail: ", "Image change to: " + position);
                         mImg.setImageURI(Uri.fromFile(new File((String)mDatas.get(position).get("_data"))));
+
                         viewIndicator.setBackgroundColor(Color.parseColor("#AA024DA4"));
-//                        position_now = mHorizontalScrollView.get;
                     }
                 });
         //添加点击回调
@@ -116,6 +104,7 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
             public void onClick(View view, int position)
             {
                 mImg.setImageURI(Uri.fromFile(new File((String)mDatas.get(position).get("_data"))));
+
                 view.setBackgroundColor(Color.parseColor("#AA024DA4"));
             }
         });
@@ -124,14 +113,15 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
     }
     private void initPhoto() {
         Intent intent = getIntent();
-
         try {
             position_now = intent.getIntExtra("position", -1);
             url = intent.getStringExtra("url");
+            type = intent.getStringExtra("type");
+
         } catch (Exception e) {
             Log.d("ERROR: ", "" + e);
         }
-        Log.d("Test: ", "" + position_now + " " + url);
+        Log.d("Test-----------------: ", "" + position_now + " " + url);
     }
     //UI组件初始化与事件绑定
     private void bindViews() {
@@ -175,14 +165,20 @@ public class PhotoDetailActivity extends Activity implements View.OnClickListene
         switch (item.getItemId()) {
             case android.R.id.home:
                 // 返回
-                System.out.println("title");
                 this.finish();
                 break;
             case R.id.action_about:
+                // go to PhotoInfoActivity
                 Intent intent = new Intent(this, PhotoInfoActivity.class);
-//                Log.d("Position", ""+position);
-                intent.putExtra("position", position_now);
-                intent.putExtra("url", (String)mDatas.get(position_now).get("_data"));
+                int position;
+                if (!init) {
+                    position = position_now;
+                } else {
+                    position =  mHorizontalScrollView.getmShowIndex();
+                }
+                // send args
+                intent.putExtra("position", position);
+                intent.putExtra("url", (String)mDatas.get(position).get("_data"));
                 startActivity(intent);
                 break;
 

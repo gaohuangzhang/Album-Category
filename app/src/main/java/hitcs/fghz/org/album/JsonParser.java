@@ -1,5 +1,7 @@
 package hitcs.fghz.org.album;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
