@@ -32,11 +32,11 @@ import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
 // some method may be used about db or others
 // adapter && view
 
-public class PhotoDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnClickListener */{
 
     // 初始化几个textview， 可以点击并且出发事件
     private TextView txt_back;
-    private TextView txt_share;
+//    private TextView txt_share;
     private TextView txt_love;
     private TextView txt_delete;
 
@@ -55,7 +55,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
     boolean init = false;
     private String type = null;
 
-    PhotoDetailActivity() {
+    public PhotoDetailActivity() {
 
     }
 
@@ -67,7 +67,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
         // 绑定textview按钮
-        bindViews();
+//        bindViews();
         // get photo list
         initPhoto();
         if (type != null)
@@ -131,22 +131,22 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
     //UI组件初始化与事件绑定
     private void bindViews() {
         // 返回删除等按钮
-        txt_back = (TextView) findViewById(R.id.back);
-        txt_share = (TextView) findViewById(R.id.share);
-        txt_love = (TextView) findViewById(R.id.love);
-        txt_delete = (TextView) findViewById(R.id.delete);
+//        txt_back = (TextView) findViewById(R.id.back);
+//        txt_share = (TextView) findViewById(R.id.share);
+//        txt_love = (TextView) findViewById(R.id.love);
+//        txt_delete = (TextView) findViewById(R.id.delete);
         // 设置监听
-        txt_back.setOnClickListener(this);
-        txt_share.setOnClickListener(this);
-        txt_love.setOnClickListener(this);
-        txt_delete.setOnClickListener(this);
+//        txt_back.setOnClickListener(this);
+//        txt_share.setOnClickListener(this);
+//        txt_love.setOnClickListener(this);
+//        txt_delete.setOnClickListener(this);
     }
     // 恢复点击状态为未点击状态
     private void setSelect() {
-        txt_back.setSelected(false);
-        txt_share.setSelected(false);
-        txt_love.setSelected(false);
-        txt_delete.setSelected(false);
+//        txt_back.setSelected(false);
+//        txt_share.setSelected(false);
+//        txt_love.setSelected(false);
+//        txt_delete.setSelected(false);
     }
     /**
      * 生成动作栏上的菜单项目
@@ -193,34 +193,37 @@ public class PhotoDetailActivity extends AppCompatActivity implements View.OnCli
         return super.onOptionsItemSelected(item);
     }
     // 下面按钮（返回删除等）的点击动作
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            // 返回
-            case R.id.back:
-                setSelect();
-                txt_back.setSelected(true);
-                System.out.println("1");
-                PhotoDetailActivity.this.finish(); // 结束当前的activity， 返回上一个界面
-                break;
-            case R.id.share: // 分享
-                setSelect();
-                txt_share.setSelected(true);
-                System.out.println("2");
+//    @Override
+//    public void onClick(View v) {
+//        switch (v.getId()){
+//            // 返回
+//            case R.id.back:
+//                setSelect();
+//                txt_back.setSelected(true);
+//                System.out.println("1");
+//                PhotoDetailActivity.this.finish(); // 结束当前的activity， 返回上一个界面
+//                break;
+////            case R.id.share: // 分享
+////                setSelect();
+////                txt_share.setSelected(true);
+////                System.out.println("2");
+////
+////                break;
+//            case R.id.love: // 喜爱
+//                setSelect();
+//                txt_love.setSelected(true);
+//                System.out.println("3");
+//
+//                break;
+////            case R.id.delete: // 删除
+////                setSelect();
+////                txt_delete.setSelected(true);
+////
+////                txt_delete.setSelected(false);
+////                System.out.println("4");
+////
+////                break;
+//        }
+//    }
 
-                break;
-            case R.id.love: // 喜爱
-                setSelect();
-                txt_love.setSelected(true);
-                System.out.println("3");
-
-                break;
-            case R.id.delete: // 删除
-                setSelect();
-                txt_delete.setSelected(true);
-                System.out.println("4");
-
-                break;
-        }
-    }
 }

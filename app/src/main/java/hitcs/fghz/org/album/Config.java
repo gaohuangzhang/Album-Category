@@ -36,10 +36,17 @@ public class Config {
     public static LruCache mImageCache;
 
     public static int tf_type_times = 14;
+    public static String[] album_type_name = {
+            "动物",
+            "建筑", "汽车", "花朵",
+            "人物", "二次元", "人物",
+            "风景", "风景", "文字",
+            "物品", "室内", "室内"
+    };
     public static String[] tf_type_name = {"动物",
-            "建筑", "车辆", "花朵",
+            "建筑", "汽车", "花朵",
             "很多人", "二次元", "人物",
-            "风景", "雪景", "含有文字",
+            "风景", "雪景", "文字",
             "物品", "教室", "工作地点"
     };
     public static int[] tf_type_image = {R.drawable.animal,
@@ -48,4 +55,5 @@ public class Config {
             R.drawable.scenery, R.drawable.snow,R.drawable.text,
             R.drawable.things,R.drawable.room,R.drawable.room, R.drawable.a
     };
+    public static boolean task_finished = false;
 }

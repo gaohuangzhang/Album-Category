@@ -2,12 +2,14 @@ package hitcs.fghz.org.album;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -32,6 +34,8 @@ public class MovieShowActivity extends AppCompatActivity {
     private List<Map> result;
     private int count = 0;
     private ImageView iv;
+    private MediaPlayer mediaPlayer01;
+    private Timer timer;
     private List<PhotoItem> photoList = new ArrayList<PhotoItem>();
     private Handler myHandler = new Handler()
     {
@@ -41,11 +45,15 @@ public class MovieShowActivity extends AppCompatActivity {
             switch (msg.what)
             {
                 case 0x24:
-                    iv.setImageURI(Uri.fromFile(new File((String) photoList.get(count % photoList.size()).getImageId())));
+                    try {
+                        iv.setImageURI(Uri.fromFile(new File((String) photoList.get(count % photoList.size()).getImageId())));
+                    }  catch (Exception e) {
+                        ;
+                    }
                     break;
+                case 0x23:
 
-                case 0x123:
-                    break;
+                    MovieShowActivity.this.finish();
             }
         }
     };
@@ -53,8 +61,8 @@ public class MovieShowActivity extends AppCompatActivity {
         @Override
         public void run() {
             count++;
-            myHandler.sendEmptyMessage(0x24);
             Log.d("MainActivity",count + "");
+            myHandler.sendEmptyMessage(0x24);
         }
     };
     @Override
@@ -68,11 +76,19 @@ public class MovieShowActivity extends AppCompatActivity {
 
         getMessage();
         initPhoto();
-        Timer timer = new Timer();
-        timer.schedule(task, 100, 2000);
+        timer = new Timer();
+        timer.schedule(task, 10, 1500);
         iv = (ImageView) findViewById(R.id.movie_image);
-        iv.setImageURI(Uri.fromFile(new File((String) photoList.get(0).getImageId())));
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Looper.prepare();
 
+                mediaPlayer01 = MediaPlayer.create(getBaseContext(), R.raw.music);
+                mediaPlayer01.start();
+//                Looper.loop();
+//            }
+//        }).start();
     }
     @Override
     protected void onResume() {
@@ -84,6 +100,26 @@ public class MovieShowActivity extends AppCompatActivity {
         }
         super.onResume();
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.cancel();//取消任务
+        mediaPlayer01.stop();
+        myHandler.removeCallbacks(task);//取消任务
+        myHandler.removeCallbacksAndMessages(null);//即取消任务，且清除消息
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            Log.d("Stop", "yes");
+            myHandler.sendEmptyMessage(0x23);
+
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     private void playMusic() {
 
@@ -94,6 +130,7 @@ public class MovieShowActivity extends AppCompatActivity {
 
             type = intent.getStringExtra("type");
         } catch (Exception e) {
+            type = null;
             Log.d("ERROR: ", "" + e);
         }
         Log.d("Info: ", "" + " " + type);

@@ -137,6 +137,7 @@ public class WelcomActivity extends AppCompatActivity {
         size = tmp.size();
         Log.d("ALBUM DATA", String.valueOf(tmp));
         String url = null;
+        String album_type;
         Cursor cursor = null;
         Cursor cursor_album = null;
         Bitmap bitmap = null;
@@ -164,10 +165,17 @@ public class WelcomActivity extends AppCompatActivity {
 
                         values.put("album_name",cr.getTitle());
                         Log.d("ADD INTO ALBUM", url + "  " + cr.getTitle());
-                        cursor_album = db.query("Album", null, "album_name ='" + cr.getTitle() + "'", null, null, null, null);
+                        int i;
+                        for (i = 0; i < Config.tf_type_times; ++i) {
+                            if (Config.tf_type_name[i].equals(cr.getTitle())) {
+                                break;
+                            }
+                        }
+                        album_type = Config.album_type_name[i];
+                        cursor_album = db.query("Album", null, "album_name ='" + album_type + "'", null, null, null, null);
                         if (!cursor_album.moveToFirst()) {
                             values_ablum = new ContentValues();
-                            values_ablum.put("album_name", cr.getTitle());
+                            values_ablum.put("album_name", album_type);
                             values_ablum.put("show_image", url);
                             db.insert("Album", null, values_ablum);
                             values_ablum.clear();
