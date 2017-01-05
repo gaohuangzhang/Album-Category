@@ -199,10 +199,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResult(RecognizerResult recognizerResult, boolean b) {
                 String text = JsonParser.parseIatResult(recognizerResult.getResultString());
                 if (!text.equals("")) {
-                    Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, VoiceFoundActivity.class);
-                    intent.putExtra("result", text);
-                    startActivity(intent);
+                    for (int i = 0; i < Config.tf_type_name.length; i++)
+                        if (text.equals(Config.tf_type_name[i])) {
+                            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(MainActivity.this, VoiceFoundActivity.class);
+                            intent.putExtra("result", text);
+                            startActivity(intent);
+                            break;
+                        }
+                    Toast.makeText(MainActivity.this, "不存在此分类", Toast.LENGTH_SHORT).show();
                 }
             }
 
