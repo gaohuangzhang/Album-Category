@@ -13,13 +13,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.List;
-
 import hitcs.fghz.org.album.Config;
 import hitcs.fghz.org.album.R;
 import hitcs.fghz.org.album.entity.MemoryItem;
-
 import static android.media.ThumbnailUtils.extractThumbnail;
 import static hitcs.fghz.org.album.utils.ImagesScaner.getBitmap;
 

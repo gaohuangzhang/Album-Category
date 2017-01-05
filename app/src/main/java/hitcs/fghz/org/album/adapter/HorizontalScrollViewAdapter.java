@@ -16,13 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-
 import java.util.List;
 import java.util.Map;
-
 import hitcs.fghz.org.album.Config;
 import hitcs.fghz.org.album.R;
-
 import static android.media.ThumbnailUtils.extractThumbnail;
 import static hitcs.fghz.org.album.utils.ImagesScaner.getBitmap;
 

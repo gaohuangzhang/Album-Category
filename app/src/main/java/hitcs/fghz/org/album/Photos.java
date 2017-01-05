@@ -16,14 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import hitcs.fghz.org.album.adapter.PhotoAdapter;
 import hitcs.fghz.org.album.entity.PhotoItem;
-
 import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumPhotos;
 import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
 import static hitcs.fghz.org.album.utils.ImagesScaner.updateGallery;
@@ -42,6 +39,7 @@ public class Photos extends Fragment {
     private boolean isInit = false;
     private boolean scoll = false;
     private PhotoAdapter adapter;
+    private boolean voice = false;
 
     List<Map> result;
     // 空的构造函数
@@ -56,6 +54,15 @@ public class Photos extends Fragment {
         if (getContext() == null) Log.d("getContext", "Null");
 
     }
+
+    @SuppressLint("ValidFragment")
+    public Photos(String type, boolean voice) {
+        this.type = type;
+        this.voice = voice;
+        Log.d("in this album", "type is not null");
+        if (getContext() == null) Log.d("getContext", "Null");
+
+    }
     // 重写创建fregement方法
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,9 +72,11 @@ public class Photos extends Fragment {
         if (type != null) {
             this.result = getAlbumPhotos(getContext(), this.type);
             try {
-                android.support.v7.app.ActionBar actionBar = MainActivity.actionBar;
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setTitle(type);
+                if (!voice) {
+                    android.support.v7.app.ActionBar actionBar = MainActivity.actionBar;
+                    actionBar.setDisplayHomeAsUpEnabled(true);
+                    actionBar.setTitle(type);
+                }
             } catch (Exception e) {
                 ;
             }

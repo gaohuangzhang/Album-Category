@@ -29,6 +29,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -51,7 +52,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import hitcs.fghz.org.album.dao.MyDatabaseHelper;
-
 
 /**
  * 主活动
@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 语音
             case R.id.action_voice:
                 startRecord();
+                break;
             default:
                 break;
         }
@@ -199,17 +200,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDialog.setListener(new RecognizerDialogListener() {
             @Override
             public void onResult(RecognizerResult recognizerResult, boolean b) {
+                boolean flag = false;
                 String text = JsonParser.parseIatResult(recognizerResult.getResultString());
                 if (!text.equals("")) {
-                    for (int i = 0; i < Config.tf_type_name.length; i++)
-                        if (text.equals(Config.tf_type_name[i])) {
-                            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(MainActivity.this, VoiceFoundActivity.class);
-                            intent.putExtra("result", text);
-                            startActivity(intent);
+                    for (int i = 0; i < Config.album_type_name.length; i++)
+                        if (text.equals(Config.album_type_name[i])) {
+                            flag = true;
                             break;
                         }
-                    Toast.makeText(MainActivity.this, "不存在此分类", Toast.LENGTH_SHORT).show();
+                    if(!flag)
+                        Toast.makeText(MainActivity.this, "不存在此分类", Toast.LENGTH_SHORT).show();
+                    else {
+                        Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, VoiceFoundActivity.class);
+                        intent.putExtra("result", text);
+                        startActivity(intent);
+                    }
                 }
             }
 
@@ -220,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         mDialog.show();
         Toast.makeText(this, "请开始说话", Toast.LENGTH_SHORT).show();
+
     }
 
     /**
