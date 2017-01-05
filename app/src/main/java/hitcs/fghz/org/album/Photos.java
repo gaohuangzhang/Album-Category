@@ -4,6 +4,8 @@ package hitcs.fghz.org.album;
  * 这个就是进入app之后的第一个界面
  * Created by me on 16-12-19.
  */
+
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -19,16 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-// 导入相片的元素（一个照片）
-import hitcs.fghz.org.album.entity.PhotoItem;
-// 照片元素的适配器， 对于gridview需要适配器将数据传递给布局显示
 import hitcs.fghz.org.album.adapter.PhotoAdapter;
-// static method: get all photo
-import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumInfo;
+import hitcs.fghz.org.album.entity.PhotoItem;
+
 import static hitcs.fghz.org.album.utils.ImagesScaner.getAlbumPhotos;
 import static hitcs.fghz.org.album.utils.ImagesScaner.getMediaImageInfo;
-// static method: when save image you need to update the db by this
 import static hitcs.fghz.org.album.utils.ImagesScaner.updateGallery;
+
+// 导入相片的元素（一个照片）
+// 照片元素的适配器， 对于gridview需要适配器将数据传递给布局显示
+// static method: get all photo
+// static method: when save image you need to update the db by this
 
 public class Photos extends Fragment {
     // show 所有照片  或者  某个相册
@@ -46,6 +49,7 @@ public class Photos extends Fragment {
         this.type = null;
         Log.d("in this album", "null constructer");
     }
+    @SuppressLint("ValidFragment")
     public Photos(String type) {
         this.type = type;
         Log.d("in this album", "type is not null");
@@ -147,7 +151,10 @@ public class Photos extends Fragment {
         protected String doInBackground(String... params) {
             try {
                 // update db
+
+
                 updateGallery(getContext(), fileName);
+
                 // we don't know the time when update db is end (it works in another thread)
                 // so now i set a time to wait it finished (it is a bad way)
                 while (!Config.workdone) {

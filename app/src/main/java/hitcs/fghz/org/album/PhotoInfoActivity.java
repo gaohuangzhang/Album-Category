@@ -27,8 +27,6 @@ import java.util.Map;
 
 import hitcs.fghz.org.album.adapter.PhotoTypeAdapter;
 
-import static hitcs.fghz.org.album.utils.ImagesScaner.getInformation;
-
 
 /**
  * when you want to see more information about one image, this activity will be used
@@ -49,7 +47,7 @@ public class PhotoInfoActivity extends AppCompatActivity {
     // image info
     private Map<String, String> image_info;
 
-    PhotoInfoActivity() {
+    public PhotoInfoActivity() {
 
     }
 

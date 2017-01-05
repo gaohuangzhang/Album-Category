@@ -45,7 +45,11 @@ public class Memory extends Fragment {
                                     int position, long id) {
                 Log.d("Memeory", "" + position);
                 Intent intent = new Intent(getActivity(), MovieShowActivity.class);
-                intent.putExtra("type" ,memoryList.get(position).getType());
+                if (memoryList.get(position).getType() == "全部图片") {
+
+                } else {
+                    intent.putExtra("type", memoryList.get(position).getType());
+                }
                 startActivity(intent);
             }
         });
@@ -55,6 +59,8 @@ public class Memory extends Fragment {
     private void initMemory() {
         MemoryItem memory;
         result = getAlbumInfo(getContext());
+        memory = new MemoryItem(result.get(0).get("show_image"), "全部图片");
+        memoryList.add(memory);
 
         for (Map<String, String> s: result) {
             memory = new MemoryItem(s.get("show_image"), s.get("album_name"));

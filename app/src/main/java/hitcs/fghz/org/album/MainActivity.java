@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Photos photos;
     private Albums albums;
     private FragmentManager fManager;
+    private List<Classifier.Recognition> results;
     private static final int PERMISSION_REQUEST_STORAGE = 200;
 
     // for camera to save image
@@ -136,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         // search item
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
         return super.onCreateOptionsMenu(menu);
     }
     /**
@@ -153,10 +155,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 actionBar.setDisplayHomeAsUpEnabled(false);
                 actionBar.setTitle(" 相册");
                 break;
-            case R.id.action_search:
-                // 搜索
-               System.out.println("search");
-                break;
+//            case R.id.action_search:
+//                // 搜索
+//               System.out.println("search");
+//                break;
             case R.id.action_camera:
                 // 拍照
                 if (Build.VERSION.SDK_INT >= 23) {
@@ -242,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         matrix.postScale(scaleWidth, scaleHeight);
         Bitmap newbm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
         // get classifier information
-        final List<Classifier.Recognition> results = Config.classifier.recognizeImage(newbm);
+        results = Config.classifier.recognizeImage(newbm);
         for (final Classifier.Recognition result : results) {
             System.out.println("Result: " + result.getTitle());
         }
@@ -253,13 +255,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Config.dbHelper = new MyDatabaseHelper(this, "Album.db", null, Config.dbversion);
         SQLiteDatabase db = Config.dbHelper.getWritableDatabase();
         ContentValues values_ablum = new ContentValues();
-        values_ablum.put("album_name", results.get(0).getTitle());
-        values_ablum.put("show_image", url);
-        db.insert("Album", null, values_ablum);
         ContentValues values = new ContentValues();
-        values.put("album_name", results.get(0).getTitle());
-        values.put("url", url);
-        db.insert("AlbumPhotos", null, values);
+        String album_type;
+        Cursor cursor_album = null;
+        for (Classifier.Recognition cr : results) {
+            int i;
+            for (i = 0; i < Config.tf_type_times; ++i) {
+                if (Config.tf_type_name[i].equals(cr.getTitle())) {
+                    break;
+                }
+            }
+            album_type = Config.album_type_name[i];
+            cursor_album = db.query("Album", null, "album_name ='" + album_type + "'", null, null, null, null);
+            if (!cursor_album.moveToFirst()) {
+                values_ablum.put("album_name", album_type);
+                values_ablum.put("show_image", url);
+                db.insert("Album", null, values_ablum);
+                values_ablum.clear();
+            }
+
+            values.put("album_name", album_type);
+            values.put("url", url);
+            db.insert("AlbumPhotos", null, values);
+            values.clear();
+        }
         db.close();
 
         // show notification about tf information of image
