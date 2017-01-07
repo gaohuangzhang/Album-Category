@@ -18,6 +18,7 @@ package org.tensorflow.demo;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -44,13 +45,11 @@ public interface Classifier {
      */
     private final Float confidence;
 
-    /**
-     * Optional location within the source image for the location of the recognized object.
-     */
-    private final RectF location;
+    /** Optional location within the source image for the location of the recognized object. */
+    private RectF location;
 
     public Recognition(
-        final String id, final String title, final Float confidence, final RectF location) {
+            final String id, final String title, final Float confidence, final RectF location) {
       this.id = id;
       this.title = title;
       this.confidence = confidence;
@@ -71,6 +70,10 @@ public interface Classifier {
 
     public RectF getLocation() {
       return new RectF(location);
+    }
+
+    public void setLocation(RectF location) {
+      this.location = location;
     }
 
     @Override
